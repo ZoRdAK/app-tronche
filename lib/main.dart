@@ -119,7 +119,7 @@ class _AppRootState extends State<AppRoot> {
 
     if (!appState.isInitialized) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.backgroundLight,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
