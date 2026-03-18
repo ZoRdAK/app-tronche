@@ -47,7 +47,12 @@ class _CameraScreenState extends State<CameraScreen> {
   void initState() {
     super.initState();
     WakelockPlus.enable();
-    _initCamera();
+    if (AppConfig.isScreenshotMode) {
+      // Skip real camera in screenshot mode
+      _isInitializing = false;
+    } else {
+      _initCamera();
+    }
   }
 
   Future<void> _initCamera() async {
@@ -199,7 +204,8 @@ class _CameraScreenState extends State<CameraScreen> {
       );
     }
 
-    if (_error != null || !_cameraService.isInitialized) {
+    if (!AppConfig.isScreenshotMode &&
+        (_error != null || !_cameraService.isInitialized)) {
       return Scaffold(
         backgroundColor: AppColors.background,
         body: Center(
@@ -226,7 +232,6 @@ class _CameraScreenState extends State<CameraScreen> {
       );
     }
 
-    final controller = _cameraService.controller!;
     final bool busy = _isCountingDown || _isCapturingGif || _isAssemblingGif;
 
     return Scaffold(
@@ -234,17 +239,25 @@ class _CameraScreenState extends State<CameraScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Camera preview with correct aspect ratio
-          SizedBox.expand(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: controller.value.previewSize!.height,
-                height: controller.value.previewSize!.width,
-                child: CameraPreview(controller),
+          // Camera preview or screenshot placeholder
+          if (AppConfig.isScreenshotMode)
+            SizedBox.expand(
+              child: Image.asset(
+                'assets/screenshots/Gemini_Generated_Image_wsjjpowsjjpowsjj.png',
+                fit: BoxFit.cover,
+              ),
+            )
+          else
+            SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: _cameraService.controller!.value.previewSize!.height,
+                  height: _cameraService.controller!.value.previewSize!.width,
+                  child: CameraPreview(_cameraService.controller!),
+                ),
               ),
             ),
-          ),
 
           // Live overlay
           if (config != null)

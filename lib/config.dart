@@ -8,6 +8,10 @@ class AppConfig {
   static const Duration emailAutoReturnDelay = Duration(seconds: 5);
   static const Duration idleReturnDelay = Duration(seconds: 15);
   static const int defaultTimerDuration = 3;
+
+  /// True only when running screenshot tests via --dart-define=SCREENSHOT_MODE=true
+  static const bool isScreenshotMode =
+      bool.fromEnvironment('SCREENSHOT_MODE', defaultValue: false);
 }
 
 class AppColors {

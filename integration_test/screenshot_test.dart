@@ -1,22 +1,42 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:tronche/main.dart' as app;
+import 'package:tronche/screens/booth/preview_screen.dart';
+import 'package:tronche/screens/booth/qr_screen.dart';
 import 'package:tronche/services/database_service.dart';
-import 'package:tronche/services/api_service.dart';
 import 'package:tronche/models/event_config.dart';
-import 'package:tronche/models/photo.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+
+/// Helper to set up a fake logged-in state with photos
+Future<void> _setupFakeEvent(DatabaseService db) async {
+  final pinHash = sha256.convert(utf8.encode('1234')).toString();
+
+  final config = EventConfig(
+    serverEventId: 'demo-event-id',
+    userEmail: 'karl.cosse@gmail.com',
+    jwtToken: 'demo-token',
+    refreshToken: 'demo-refresh',
+    name1: 'Marie',
+    name2: 'Thomas',
+    eventDate: '2025-06-14',
+    overlayTemplate: 'elegant',
+    timerDuration: 3,
+    adminPasswordHash: pinHash,
+    shareCode: 'DEMO_SHARE_CODE',
+    plan: 'premium',
+  );
+  await db.saveEventConfig(config);
+}
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('App Store Screenshots', () {
 
+    // Screenshot 1: Welcome screen with logo
     testWidgets('01 - Welcome Screen', (tester) async {
-      // Clear any existing data
       final db = DatabaseService();
       await db.clearEventConfig();
 
@@ -26,93 +46,22 @@ void main() {
       await binding.takeScreenshot('01_welcome');
     });
 
-    testWidgets('02 - Login Screen', (tester) async {
+    // Screenshot 2: Idle screen with slideshow of wedding photos
+    testWidgets('02 - Booth Idle Screen', (tester) async {
       final db = DatabaseService();
-      await db.clearEventConfig();
+      await _setupFakeEvent(db);
 
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 2));
+      // Let slideshow timer fire to show a photo
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle(const Duration(seconds: 1));
 
-      // Tap "J'ai déjà un compte"
-      final loginLink = find.text("J'ai déjà un compte");
-      await tester.tap(loginLink);
-      await tester.pumpAndSettle();
-
-      await binding.takeScreenshot('02_login');
+      await binding.takeScreenshot('02_idle');
     });
 
-    testWidgets('03 - Event Setup Screen', (tester) async {
-      final db = DatabaseService();
-      await db.clearEventConfig();
-
-      app.main();
-      await tester.pumpAndSettle(const Duration(seconds: 2));
-
-      // Tap "Créer mon photobooth"
-      final createBtn = find.text('Créer mon photobooth');
-      await tester.tap(createBtn);
-      await tester.pumpAndSettle();
-
-      // Fill in registration
-      await tester.enterText(find.byType(TextFormField).at(0), 'demo@tronche.app');
-      await tester.enterText(find.byType(TextFormField).at(1), 'DemoPass123!');
-      await tester.enterText(find.byType(TextFormField).at(2), 'DemoPass123!');
-
-      // We can't actually register (would create duplicate), so just screenshot the register screen
-      await tester.pumpAndSettle();
-      await binding.takeScreenshot('03_register');
-    });
-
-    testWidgets('04 - Booth Idle Screen (with photos)', (tester) async {
-      // Pre-populate database with event config and photos (no API call needed)
-      final db = DatabaseService();
-
-      final pinHash = sha256.convert(utf8.encode('1234')).toString();
-
-      final config = EventConfig(
-        serverEventId: 'demo-event-id',
-        userEmail: 'karl.cosse@gmail.com',
-        jwtToken: 'demo-token',
-        refreshToken: 'demo-refresh',
-        name1: 'Marie',
-        name2: 'Thomas',
-        eventDate: '2025-06-14',
-        overlayTemplate: 'elegant',
-        timerDuration: 3,
-        adminPasswordHash: pinHash,
-        shareCode: 'DEMO_SHARE_CODE',
-        plan: 'premium',
-      );
-      await db.saveEventConfig(config);
-
-      // Copy sample photos to app documents dir and add to DB
-      final appDir = Directory('/Users/karl/Dev/tronche/docs/screenshot');
-      final files = appDir.listSync().whereType<File>().where((f) => f.path.endsWith('.png')).toList();
-
-      int photoNum = 0;
-      for (final file in files.take(4)) {
-        photoNum++;
-        final photo = Photo(
-          localPath: file.path,
-          thumbnailPath: file.path,
-          photoCode: 'screenshot_photo_$photoNum',
-          takenAt: DateTime(2025, 6, 14, 15, photoNum),
-          isSynced: true,
-          serverPhotoId: 'server_$photoNum',
-          syncedAt: DateTime.now(),
-        );
-        await db.insertPhoto(photo);
-      }
-
-      app.main();
-      await tester.pumpAndSettle(const Duration(seconds: 3));
-
-      // Should be on idle screen with slideshow
-      await binding.takeScreenshot('04_idle');
-    });
-
-    testWidgets('05 - Camera Screen', (tester) async {
-      // DB should still have config from previous test
+    // Screenshot 3: Camera screen with Photo/GIF toggle
+    testWidgets('03 - Camera Screen', (tester) async {
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
@@ -123,31 +72,70 @@ void main() {
         await tester.pumpAndSettle(const Duration(seconds: 2));
       }
 
-      await binding.takeScreenshot('05_camera');
+      await binding.takeScreenshot('03_camera');
     });
 
+    // Screenshot 4: Preview screen (real screen with screenshot mode asset)
+    testWidgets('04 - Photo Preview', (tester) async {
+      app.main();
+      await tester.pumpAndSettle(const Duration(seconds: 3));
+
+      // Tap "Touchez pour commencer" to get into the booth flow
+      final startBtn = find.textContaining('Touchez');
+      if (startBtn.evaluate().isNotEmpty) {
+        await tester.tap(startBtn);
+        await tester.pumpAndSettle(const Duration(seconds: 2));
+      }
+
+      // Navigate to real PreviewScreen (screenshot mode uses asset image)
+      final context = tester.element(find.byType(Scaffold).first);
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const PreviewScreen(
+            rawPhotoPath: 'screenshot_mode',
+            compositedPhotoPath: 'screenshot_mode',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+
+      await binding.takeScreenshot('04_preview');
+    });
+
+    // Screenshot 5: QR Code screen (real QrScreen)
+    testWidgets('05 - QR Code Screen', (tester) async {
+      app.main();
+      await tester.pumpAndSettle(const Duration(seconds: 3));
+
+      // Navigate to real QrScreen
+      final context = tester.element(find.byType(Scaffold).first);
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const QrScreen(photoCode: 'DEMO_PHOTO_CODE'),
+        ),
+      );
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+
+      await binding.takeScreenshot('05_qrcode');
+    });
+
+    // Screenshot 6: Admin Dashboard
     testWidgets('06 - Admin Dashboard', (tester) async {
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
-      // Long press on "Tronche!" branding to open admin
-      final branding = find.textContaining('Tronche');
-      if (branding.evaluate().isNotEmpty) {
-        await tester.longPress(branding.last);
-        await tester.pumpAndSettle(const Duration(seconds: 1));
-      }
+      // Long press on branding logo to open admin
+      final branding = find.byKey(const Key('branding_logo'));
+      expect(branding, findsOneWidget);
+      await tester.longPress(branding);
+      await tester.pumpAndSettle(const Duration(seconds: 2));
 
       // Enter PIN 1234
-      final pinField = find.byType(TextField);
-      if (pinField.evaluate().isEmpty) {
-        // Might be custom keypad - tap 1, 2, 3, 4
-        // Try finding number buttons
-        for (final digit in ['1', '2', '3', '4']) {
-          final btn = find.text(digit);
-          if (btn.evaluate().isNotEmpty) {
-            await tester.tap(btn.first);
-            await tester.pumpAndSettle(const Duration(milliseconds: 300));
-          }
+      for (final digit in ['1', '2', '3', '4']) {
+        final btn = find.widgetWithText(TextButton, digit);
+        if (btn.evaluate().isNotEmpty) {
+          await tester.tap(btn.first);
+          await tester.pump(const Duration(milliseconds: 400));
         }
       }
 

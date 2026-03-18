@@ -23,11 +23,23 @@ class _IdleScreenState extends State<IdleScreen> {
   Timer? _longPressTimer;
   bool _longPressActive = false;
 
+  /// Asset paths used as slideshow images in screenshot mode.
+  static const _screenshotAssets = [
+    'assets/screenshots/Gemini_Generated_Image_vf0oy1vf0oy1vf0o.png',
+    'assets/screenshots/Gemini_Generated_Image_wsjjpowsjjpowsjj.png',
+    'assets/screenshots/Gemini_Generated_Image_wwrdjwwwrdjwwwrd.png',
+    'assets/screenshots/Gemini_Generated_Image_xrxizxrxizxrxizx.png',
+  ];
+
   @override
   void initState() {
     super.initState();
     // Keep screen on while in photobooth mode.
     WakelockPlus.enable();
+    if (AppConfig.isScreenshotMode) {
+      // No camera needed in screenshot mode
+      return;
+    }
     // Load photos and initialise camera for fallback
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PhotoState>().loadPhotos();
@@ -103,16 +115,29 @@ class _IdleScreenState extends State<IdleScreen> {
       cameraFallback = Container(color: AppColors.background);
     }
 
+    // In screenshot mode, show asset images instead of file-based slideshow
+    Widget backgroundWidget;
+    if (AppConfig.isScreenshotMode) {
+      backgroundWidget = SizedBox.expand(
+        child: Image.asset(
+          _screenshotAssets.first,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else {
+      backgroundWidget = SlideshowWidget(
+        photoPaths: photoPaths,
+        fallback: cameraFallback,
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
         fit: StackFit.expand,
         children: [
           // Background: slideshow or camera
-          SlideshowWidget(
-            photoPaths: photoPaths,
-            fallback: cameraFallback,
-          ),
+          backgroundWidget,
 
           // Top overlay: couple names + date
           if (config != null)
@@ -226,6 +251,7 @@ class _IdleScreenState extends State<IdleScreen> {
                   const SizedBox(height: 20),
                   // Branding with long-press to admin
                   GestureDetector(
+                    key: const Key('branding_logo'),
                     onTapDown: (_) => _startLongPress(),
                     onTapUp: (_) => _cancelLongPress(),
                     onTapCancel: _cancelLongPress,

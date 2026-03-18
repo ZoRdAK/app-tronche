@@ -44,7 +44,13 @@ class _PreviewScreenState extends State<PreviewScreen> {
     _photoCode = _generatePhotoCode();
     // Show raw photo immediately for fast transition (Bug 3 fix)
     _displayPhotoPath = widget.rawPhotoPath ?? widget.compositedPhotoPath;
-    WidgetsBinding.instance.addPostFrameCallback((_) => _compositeAndSave());
+    if (AppConfig.isScreenshotMode) {
+      // Skip compositing/saving in screenshot mode
+      _isSaving = false;
+    } else {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _compositeAndSave());
+    }
   }
 
   String _generatePhotoCode() {
@@ -148,10 +154,16 @@ class _PreviewScreenState extends State<PreviewScreen> {
         fit: StackFit.expand,
         children: [
           // Photo / GIF — Image.file handles animated GIFs natively in Flutter
-          Image.file(
-            File(_displayPhotoPath),
-            fit: BoxFit.contain,
-          ),
+          if (AppConfig.isScreenshotMode)
+            Image.asset(
+              'assets/screenshots/Gemini_Generated_Image_wsjjpowsjjpowsjj.png',
+              fit: BoxFit.contain,
+            )
+          else
+            Image.file(
+              File(_displayPhotoPath),
+              fit: BoxFit.contain,
+            ),
 
           // GIF badge
           if (_isGif)
