@@ -8,6 +8,9 @@ import 'providers/sync_state.dart';
 import 'screens/onboarding/welcome_screen.dart';
 import 'screens/booth/idle_screen.dart';
 import 'screens/admin/admin_gate_screen.dart';
+import 'services/api_service.dart';
+import 'services/database_service.dart';
+import 'services/sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,11 +29,23 @@ class TroncheApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Shared instances so SyncService is accessible from admin screens.
+    final db = DatabaseService();
+    final api = ApiService(db);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppState()),
         ChangeNotifierProvider(create: (_) => PhotoState()),
         ChangeNotifierProvider(create: (_) => SyncState()),
+        ProxyProvider2<PhotoState, SyncState, SyncService>(
+          update: (_, photoState, syncState, __) => SyncService(
+            db: db,
+            api: api,
+            photoState: photoState,
+            syncState: syncState,
+          ),
+        ),
       ],
       child: MaterialApp(
         title: AppConfig.appName,
@@ -48,27 +63,6 @@ class TroncheApp extends StatelessWidget {
         home: const AppRoot(),
         routes: {
           '/admin': (_) => const AdminGateScreen(),
-          '/gallery': (_) => const Scaffold(
-                backgroundColor: Color(0xFF111111),
-                body: Center(
-                  child: Text('Galerie (Task 9)',
-                      style: TextStyle(color: Colors.white54)),
-                ),
-              ),
-          '/dashboard': (_) => const Scaffold(
-                backgroundColor: Color(0xFF111111),
-                body: Center(
-                  child: Text('Dashboard (Task 9)',
-                      style: TextStyle(color: Colors.white54)),
-                ),
-              ),
-          '/subscription': (_) => const Scaffold(
-                backgroundColor: Color(0xFF111111),
-                body: Center(
-                  child: Text('Abonnement (Task 9)',
-                      style: TextStyle(color: Colors.white54)),
-                ),
-              ),
         },
       ),
     );
@@ -83,6 +77,8 @@ class AppRoot extends StatefulWidget {
 }
 
 class _AppRootState extends State<AppRoot> {
+  bool _syncStarted = false;
+
   @override
   void initState() {
     super.initState();
@@ -91,6 +87,26 @@ class _AppRootState extends State<AppRoot> {
       context.read<AppState>().init();
       context.read<SyncState>().startMonitoring();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final appState = context.watch<AppState>();
+    final syncService = context.read<SyncService>();
+    if (appState.isLoggedIn && !_syncStarted) {
+      _syncStarted = true;
+      syncService.start();
+    } else if (!appState.isLoggedIn && _syncStarted) {
+      _syncStarted = false;
+      syncService.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    context.read<SyncService>().stop();
+    super.dispose();
   }
 
   @override
