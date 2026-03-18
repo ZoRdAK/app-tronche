@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config.dart';
 
 /// Animated countdown overlay widget.
 /// Each number scales in from 1.5x → 1.0x with a fade, matching the spec.
@@ -70,8 +71,8 @@ class _CountdownOverlayState extends State<CountdownOverlay>
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
                   shadows: [
-                    Shadow(blurRadius: 60, color: Color(0xFF667EEA)),
-                    Shadow(blurRadius: 30, color: Color(0xFF667EEA)),
+                    Shadow(blurRadius: 60, color: AppColors.primaryPink),
+                    Shadow(blurRadius: 30, color: AppColors.orange),
                     Shadow(blurRadius: 10, color: Colors.black54),
                   ],
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../config.dart';
 import '../../providers/app_state.dart';
 import '../../services/api_service.dart';
 import '../../services/database_service.dart';
@@ -93,7 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -122,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 8),
                 const Text(
                   'Configurez votre photobooth en quelques minutes.',
-                  style: TextStyle(fontSize: 15, color: Color(0xFF888888)),
+                  style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 36),
                 _buildLabel('Email'),
@@ -152,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         _obscurePassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: const Color(0xFF555555),
+                        color: AppColors.textMuted,
                       ),
                       onPressed: () =>
                           setState(() => _obscurePassword = !_obscurePassword),
@@ -178,7 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         _obscureConfirm
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: const Color(0xFF555555),
+                        color: AppColors.textMuted,
                       ),
                       onPressed: () =>
                           setState(() => _obscureConfirm = !_obscureConfirm),
@@ -202,7 +203,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         value: _cguAccepted,
                         onChanged: (v) =>
                             setState(() => _cguAccepted = v ?? false),
-                        activeColor: const Color(0xFF667EEA),
+                        activeColor: AppColors.primaryPink,
                         side: const BorderSide(color: Color(0xFF444444)),
                       ),
                       Expanded(
@@ -228,7 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       child: const Text(
                                         'CGU',
                                         style: TextStyle(
-                                          color: Color(0xFF667EEA),
+                                          color: AppColors.primaryPink,
                                           fontSize: 14,
                                           decoration: TextDecoration.underline,
                                         ),
@@ -244,7 +245,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       child: const Text(
                                         'Politique de Confidentialité',
                                         style: TextStyle(
-                                          color: Color(0xFF667EEA),
+                                          color: AppColors.primaryPink,
                                           fontSize: 14,
                                           decoration: TextDecoration.underline,
                                         ),
@@ -272,13 +273,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Row(
                       children: [
                         const Icon(Icons.error_outline,
-                            color: Color(0xFFE57373), size: 18),
+                            color: AppColors.error, size: 18),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             _errorMessage!,
                             style: const TextStyle(
-                                color: Color(0xFFE57373), fontSize: 14),
+                                color: AppColors.error, fontSize: 14),
                           ),
                         ),
                       ],
@@ -292,22 +293,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: _isLoading
                       ? const Center(
                           child: CircularProgressIndicator(
-                            color: Color(0xFF667EEA),
+                            color: AppColors.primaryPink,
                           ),
                         )
                       : DecoratedBox(
                           decoration: BoxDecoration(
                             gradient: _isFormValid
-                                ? const LinearGradient(
-                                    colors: [
-                                      Color(0xFF667EEA),
-                                      Color(0xFF764BA2),
-                                    ],
-                                  )
+                                ? AppColors.primaryGradient
                                 : null,
                             color: _isFormValid
                                 ? null
-                                : const Color(0xFF2A2A2A),
+                                : AppColors.inputBorder,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: ElevatedButton(
@@ -327,7 +323,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: _isFormValid
                                     ? Colors.white
-                                    : const Color(0xFF555555),
+                                    : AppColors.textMuted,
                               ),
                             ),
                           ),
@@ -358,26 +354,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
       hintText: hint,
       hintStyle: const TextStyle(color: Color(0xFF444444)),
       filled: true,
-      fillColor: const Color(0xFF1A1A1A),
+      fillColor: AppColors.inputFill,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+        borderSide: const BorderSide(color: AppColors.inputBorder),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+        borderSide: const BorderSide(color: AppColors.inputBorder),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF667EEA), width: 1.5),
+        borderSide: const BorderSide(color: AppColors.primaryPink, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE57373)),
+        borderSide: const BorderSide(color: AppColors.error),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE57373), width: 1.5),
+        borderSide: const BorderSide(color: AppColors.error, width: 1.5),
       ),
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

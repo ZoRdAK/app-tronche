@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../config.dart';
 import '../../models/send_queue_item.dart';
 import '../../services/database_service.dart';
 import 'camera_screen.dart';
@@ -92,7 +93,7 @@ class _EmailScreenState extends State<EmailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 32),
@@ -139,19 +140,19 @@ class _EmailScreenState extends State<EmailScreen> {
                     hintStyle: const TextStyle(
                         color: Color(0xFF333333), fontSize: 22),
                     filled: true,
-                    fillColor: const Color(0xFF1A1A1A),
+                    fillColor: AppColors.inputFill,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                      borderSide: const BorderSide(color: AppColors.inputBorder),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                      borderSide: const BorderSide(color: AppColors.inputBorder),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: const BorderSide(
-                          color: Color(0xFF667EEA), width: 2),
+                          color: AppColors.primaryPink, width: 2),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),
@@ -171,21 +172,16 @@ class _EmailScreenState extends State<EmailScreen> {
                   child: _isSending
                       ? const Center(
                           child: CircularProgressIndicator(
-                              color: Color(0xFF667EEA)),
+                              color: AppColors.primaryPink),
                         )
                       : DecoratedBox(
                           decoration: BoxDecoration(
                             gradient: _isEmailValid
-                                ? const LinearGradient(
-                                    colors: [
-                                      Color(0xFF667EEA),
-                                      Color(0xFF764BA2),
-                                    ],
-                                  )
+                                ? AppColors.primaryGradient
                                 : null,
                             color: _isEmailValid
                                 ? null
-                                : const Color(0xFF2A2A2A),
+                                : AppColors.inputBorder,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: ElevatedButton(
@@ -205,7 +201,7 @@ class _EmailScreenState extends State<EmailScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: _isEmailValid
                                     ? Colors.white
-                                    : const Color(0xFF555555),
+                                    : AppColors.textMuted,
                               ),
                             ),
                           ),
@@ -248,7 +244,7 @@ class _EmailScreenState extends State<EmailScreen> {
                   child: const Text(
                     'Prendre une autre photo',
                     style: TextStyle(
-                        color: Color(0xFF667EEA), fontSize: 16),
+                        color: AppColors.primaryPink, fontSize: 16),
                   ),
                 ),
               ],

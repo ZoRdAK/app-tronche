@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../config.dart';
 
 /// Full-screen crossfade slideshow of local photo files.
 /// Falls back to [fallback] when [photoPaths] is empty.
@@ -83,7 +84,7 @@ class _SlideshowWidgetState extends State<SlideshowWidget> {
       child: Image.file(
         File(path),
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(color: const Color(0xFF111111)),
+        errorBuilder: (_, __, ___) => Container(color: AppColors.background),
       ),
     );
   }

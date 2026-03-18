@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:crypto/crypto.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'dart:convert';
+import '../../config.dart';
 import '../../providers/app_state.dart';
 import 'dashboard_screen.dart';
 
@@ -84,7 +85,7 @@ class _AdminGateScreenState extends State<AdminGateScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -145,11 +146,11 @@ class _AdminGateScreenState extends State<AdminGateScreen>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: filled
-                              ? const Color(0xFF667EEA)
-                              : const Color(0xFF2A2A2A),
+                              ? AppColors.primaryPink
+                              : AppColors.inputBorder,
                           border: Border.all(
                             color: filled
-                                ? const Color(0xFF667EEA)
+                                ? AppColors.primaryPink
                                 : const Color(0xFF444444),
                           ),
                         ),

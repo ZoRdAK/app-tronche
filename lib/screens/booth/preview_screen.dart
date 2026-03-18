@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config.dart';
 import '../../models/photo.dart';
 import '../../models/send_queue_item.dart';
 import '../../providers/app_state.dart';
@@ -128,7 +129,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -175,7 +176,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
 
           if (_isSaving)
             const Center(
-              child: CircularProgressIndicator(color: Color(0xFF667EEA)),
+              child: CircularProgressIndicator(color: AppColors.primaryPink),
             ),
         ],
       ),
@@ -239,7 +240,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.lock_outline, color: Color(0xFF667EEA), size: 40),
+        const Icon(Icons.lock_outline, color: AppColors.primaryPink, size: 40),
         const SizedBox(height: 12),
         const Text(
           'Limite de photos atteinte',
@@ -258,7 +259,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
           child: ElevatedButton(
             onPressed: () => Navigator.of(context).pushNamed('/subscription'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF667EEA),
+              backgroundColor: AppColors.primaryPink,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),

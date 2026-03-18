@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import '../../config.dart';
 import '../../providers/app_state.dart';
 import '../../services/api_service.dart';
 import '../../services/database_service.dart';
@@ -141,9 +142,9 @@ class _ConfigScreenState extends State<ConfigScreen> {
     final appState = context.watch<AppState>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.inputFill,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -188,7 +189,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                 child: Row(
                   children: [
                     const Icon(Icons.calendar_today,
-                        color: Color(0xFF667EEA), size: 18),
+                        color: AppColors.primaryPink, size: 18),
                     const SizedBox(width: 12),
                     Text(
                       _eventDate != null
@@ -227,12 +228,12 @@ class _ConfigScreenState extends State<ConfigScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: selected
-                            ? const Color(0xFF667EEA).withAlpha(40)
+                            ? AppColors.primaryPink.withAlpha(40)
                             : const Color(0xFF1E1E1E),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: selected
-                              ? const Color(0xFF667EEA)
+                              ? AppColors.primaryPink
                               : Colors.transparent,
                           width: 1.5,
                         ),
@@ -274,12 +275,12 @@ class _ConfigScreenState extends State<ConfigScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
                         color: selected
-                            ? const Color(0xFF667EEA).withAlpha(40)
+                            ? AppColors.primaryPink.withAlpha(40)
                             : const Color(0xFF1E1E1E),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: selected
-                              ? const Color(0xFF667EEA)
+                              ? AppColors.primaryPink
                               : Colors.transparent,
                           width: 1.5,
                         ),
@@ -289,7 +290,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: selected
-                              ? const Color(0xFF667EEA)
+                              ? AppColors.primaryPink
                               : Colors.white,
                           fontWeight: selected
                               ? FontWeight.w700
@@ -334,7 +335,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
             ElevatedButton(
               onPressed: _isSaving ? null : _save,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF667EEA),
+                backgroundColor: AppColors.primaryPink,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../config.dart';
 import 'register_screen.dart';
 import 'login_screen.dart';
 
@@ -9,7 +10,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -17,20 +18,21 @@ class WelcomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Spacer(flex: 2),
-              // App name with gradient
-              ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ).createShader(bounds),
-                child: const Text(
-                  'Tronche!',
-                  style: TextStyle(
-                    fontSize: 72,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    letterSpacing: -2,
+              // App logo with gradient fallback
+              Image.asset(
+                'assets/logo.png',
+                width: 280,
+                errorBuilder: (_, __, ___) => ShaderMask(
+                  shaderCallback: (bounds) => AppColors.primaryGradient
+                      .createShader(bounds),
+                  child: const Text(
+                    'Tronche!',
+                    style: TextStyle(
+                      fontSize: 72,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: -2,
+                    ),
                   ),
                 ),
               ),
@@ -39,7 +41,7 @@ class WelcomeScreen extends StatelessWidget {
                 'Le photobooth de votre mariage',
                 style: TextStyle(
                   fontSize: 18,
-                  color: Color(0xFF888888),
+                  color: AppColors.textSecondary,
                   fontWeight: FontWeight.w400,
                 ),
                 textAlign: TextAlign.center,
@@ -51,9 +53,7 @@ class WelcomeScreen extends StatelessWidget {
                 height: 56,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                    ),
+                    gradient: AppColors.primaryGradient,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: ElevatedButton(
@@ -94,7 +94,7 @@ class WelcomeScreen extends StatelessWidget {
                   "J'ai déjà un compte",
                   style: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF667EEA),
+                    color: AppColors.primaryPink,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -110,7 +110,7 @@ class WelcomeScreen extends StatelessWidget {
                       'CGU',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF555555),
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ),
@@ -125,7 +125,7 @@ class WelcomeScreen extends StatelessWidget {
                       'Politique de confidentialité',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF555555),
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ),

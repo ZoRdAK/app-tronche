@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import '../../config.dart';
 import '../../providers/app_state.dart';
 import '../../services/api_service.dart';
 import '../../services/database_service.dart';
@@ -55,7 +56,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
         return Theme(
           data: ThemeData.dark().copyWith(
             colorScheme: const ColorScheme.dark(
-              primary: Color(0xFF667EEA),
+              primary: AppColors.primaryPink,
               onPrimary: Colors.white,
               surface: Color(0xFF1E1E1E),
               onSurface: Colors.white,
@@ -141,7 +142,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -201,14 +202,14 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A),
+                      color: AppColors.inputFill,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF2A2A2A)),
+                      border: Border.all(color: AppColors.inputBorder),
                     ),
                     child: Row(
                       children: [
                         const Icon(Icons.calendar_today,
-                            color: Color(0xFF667EEA), size: 18),
+                            color: AppColors.primaryPink, size: 18),
                         const SizedBox(width: 12),
                         Text(
                           _eventDate == null
@@ -253,12 +254,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                             height: 48,
                             decoration: BoxDecoration(
                               gradient: isSelected
-                                  ? const LinearGradient(
-                                      colors: [
-                                        Color(0xFF667EEA),
-                                        Color(0xFF764BA2),
-                                      ],
-                                    )
+                                  ? AppColors.primaryGradient
                                   : null,
                               color: isSelected
                                   ? null
@@ -267,7 +263,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                               border: Border.all(
                                 color: isSelected
                                     ? Colors.transparent
-                                    : const Color(0xFF2A2A2A),
+                                    : AppColors.inputBorder,
                               ),
                             ),
                             child: Center(
@@ -276,7 +272,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                                 style: TextStyle(
                                   color: isSelected
                                       ? Colors.white
-                                      : const Color(0xFF888888),
+                                      : AppColors.textSecondary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                 ),
@@ -332,13 +328,13 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                     child: Row(
                       children: [
                         const Icon(Icons.error_outline,
-                            color: Color(0xFFE57373), size: 18),
+                            color: AppColors.error, size: 18),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             _errorMessage!,
                             style: const TextStyle(
-                                color: Color(0xFFE57373), fontSize: 14),
+                                color: AppColors.error, fontSize: 14),
                           ),
                         ),
                       ],
@@ -354,21 +350,16 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                   child: _isLoading
                       ? const Center(
                           child: CircularProgressIndicator(
-                              color: Color(0xFF667EEA)),
+                              color: AppColors.primaryPink),
                         )
                       : DecoratedBox(
                           decoration: BoxDecoration(
                             gradient: _isFormValid
-                                ? const LinearGradient(
-                                    colors: [
-                                      Color(0xFF667EEA),
-                                      Color(0xFF764BA2),
-                                    ],
-                                  )
+                                ? AppColors.primaryGradient
                                 : null,
                             color: _isFormValid
                                 ? null
-                                : const Color(0xFF2A2A2A),
+                                : AppColors.inputBorder,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: ElevatedButton(
@@ -388,7 +379,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: _isFormValid
                                     ? Colors.white
-                                    : const Color(0xFF555555),
+                                    : AppColors.textMuted,
                               ),
                             ),
                           ),
@@ -419,26 +410,26 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
       hintText: hint,
       hintStyle: const TextStyle(color: Color(0xFF444444)),
       filled: true,
-      fillColor: const Color(0xFF1A1A1A),
+      fillColor: AppColors.inputFill,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+        borderSide: const BorderSide(color: AppColors.inputBorder),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+        borderSide: const BorderSide(color: AppColors.inputBorder),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF667EEA), width: 1.5),
+        borderSide: const BorderSide(color: AppColors.primaryPink, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE57373)),
+        borderSide: const BorderSide(color: AppColors.error),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE57373), width: 1.5),
+        borderSide: const BorderSide(color: AppColors.error, width: 1.5),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
@@ -492,18 +483,14 @@ class _OverlayTemplateSelector extends StatelessWidget {
                 height: 90,
                 decoration: BoxDecoration(
                   gradient: isSelected
-                      ? const LinearGradient(
-                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
+                      ? AppColors.primaryGradient
                       : null,
                   color: isSelected ? null : const Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected
                         ? Colors.transparent
-                        : const Color(0xFF2A2A2A),
+                        : AppColors.inputBorder,
                   ),
                 ),
                 child: Stack(
@@ -518,7 +505,7 @@ class _OverlayTemplateSelector extends StatelessWidget {
                                 ? const Color(0xFF444444)
                                 : isSelected
                                     ? Colors.white
-                                    : const Color(0xFF888888),
+                                    : AppColors.textSecondary,
                             size: 28,
                           ),
                           const SizedBox(height: 6),
@@ -529,7 +516,7 @@ class _OverlayTemplateSelector extends StatelessWidget {
                                   ? const Color(0xFF444444)
                                   : isSelected
                                       ? Colors.white
-                                      : const Color(0xFF888888),
+                                      : AppColors.textSecondary,
                               fontWeight: FontWeight.w600,
                               fontSize: 13,
                             ),
@@ -555,7 +542,7 @@ class _OverlayTemplateSelector extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A2A),
+                            color: AppColors.inputBorder,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Icon(

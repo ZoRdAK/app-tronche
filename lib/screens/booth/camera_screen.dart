@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import '../../config.dart';
 import '../../providers/app_state.dart';
 import '../../services/camera_service.dart';
 import '../../widgets/countdown_overlay.dart';
@@ -119,16 +120,16 @@ class _CameraScreenState extends State<CameraScreen> {
 
     if (_isInitializing) {
       return const Scaffold(
-        backgroundColor: Color(0xFF111111),
+        backgroundColor: AppColors.background,
         body: Center(
-          child: CircularProgressIndicator(color: Color(0xFF667EEA)),
+          child: CircularProgressIndicator(color: AppColors.primaryPink),
         ),
       );
     }
 
     if (_error != null || !_cameraService.isInitialized) {
       return Scaffold(
-        backgroundColor: const Color(0xFF111111),
+        backgroundColor: AppColors.background,
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -145,7 +146,7 @@ class _CameraScreenState extends State<CameraScreen> {
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text('Retour',
-                    style: TextStyle(color: Color(0xFF667EEA))),
+                    style: TextStyle(color: AppColors.primaryPink)),
               ),
             ],
           ),

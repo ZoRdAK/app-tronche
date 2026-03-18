@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import '../../config.dart';
 import '../../providers/app_state.dart';
 import '../../providers/photo_state.dart';
 import '../../services/camera_service.dart';
@@ -99,11 +100,11 @@ class _IdleScreenState extends State<IdleScreen> {
         ),
       );
     } else {
-      cameraFallback = Container(color: const Color(0xFF111111));
+      cameraFallback = Container(color: AppColors.background);
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -186,13 +187,11 @@ class _IdleScreenState extends State<IdleScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 40, vertical: 18),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                          ),
+                          gradient: AppColors.primaryGradient,
                           borderRadius: BorderRadius.circular(50),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF667EEA).withAlpha(100),
+                              color: AppColors.primaryPink.withAlpha(100),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -218,13 +217,17 @@ class _IdleScreenState extends State<IdleScreen> {
                     onTapUp: (_) => _cancelLongPress(),
                     onTapCancel: _cancelLongPress,
                     onLongPress: _goToAdmin,
-                    child: const Text(
-                      'Tronche!',
-                      style: TextStyle(
-                        color: Colors.white38,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1,
+                    child: Image.asset(
+                      'assets/logo.png',
+                      height: 40,
+                      errorBuilder: (_, __, ___) => const Text(
+                        'Tronche!',
+                        style: TextStyle(
+                          color: Colors.white38,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
                       ),
                     ),
                   ),

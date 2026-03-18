@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../../config.dart';
 
 class QrScreen extends StatefulWidget {
   final String photoCode;
@@ -50,7 +51,7 @@ class _QrScreenState extends State<QrScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -129,7 +130,7 @@ class _QrScreenState extends State<QrScreen> {
                   onPressed: _goBack,
                   child: const Text(
                     'Retour',
-                    style: TextStyle(color: Color(0xFF667EEA), fontSize: 16),
+                    style: TextStyle(color: AppColors.primaryPink, fontSize: 16),
                   ),
                 ),
               ],

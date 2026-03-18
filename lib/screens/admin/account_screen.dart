@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config.dart';
 import '../../providers/app_state.dart';
 import '../../services/api_service.dart';
 import '../../services/database_service.dart';
@@ -15,9 +16,9 @@ class AccountScreen extends StatelessWidget {
     final email = appState.eventConfig?.userEmail ?? '';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.inputFill,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -41,7 +42,7 @@ class AccountScreen extends StatelessWidget {
             child: Row(
               children: [
                 const Icon(Icons.person_outline,
-                    color: Color(0xFF667EEA), size: 20),
+                    color: AppColors.primaryPink, size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -151,7 +152,7 @@ class AccountScreen extends StatelessWidget {
               }
             },
             child: const Text('Enregistrer',
-                style: TextStyle(color: Color(0xFF667EEA))),
+                style: TextStyle(color: AppColors.primaryPink)),
           ),
         ],
       ),
@@ -226,7 +227,7 @@ class AccountScreen extends StatelessWidget {
               }
             },
             child: const Text('Enregistrer',
-                style: TextStyle(color: Color(0xFF667EEA))),
+                style: TextStyle(color: AppColors.primaryPink)),
           ),
         ],
       ),
@@ -257,7 +258,7 @@ class AccountScreen extends StatelessWidget {
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
                 child: const Text('Fermer',
-                    style: TextStyle(color: Color(0xFF667EEA))),
+                    style: TextStyle(color: AppColors.primaryPink)),
               ),
             ],
           ),
@@ -405,7 +406,7 @@ class _ActionTile extends StatelessWidget {
   const _ActionTile({
     required this.icon,
     required this.label,
-    this.color = const Color(0xFF667EEA),
+    this.color = AppColors.primaryPink,
     required this.onTap,
   });
 

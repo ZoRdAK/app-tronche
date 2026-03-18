@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config.dart';
 import '../../models/send_queue_item.dart';
 import '../../providers/photo_state.dart';
 import '../../providers/sync_state.dart';
@@ -34,9 +35,9 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
     final items = syncState.queueItems;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.inputFill,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -53,7 +54,7 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
           // Network status bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            color: const Color(0xFF1A1A1A),
+            color: AppColors.inputFill,
             child: Row(
               children: [
                 Container(
@@ -79,7 +80,7 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
                     height: 12,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Color(0xFF667EEA),
+                      color: AppColors.primaryPink,
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -130,7 +131,7 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
                 style: TextStyle(color: Colors.white, fontSize: 15),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF667EEA),
+                backgroundColor: AppColors.primaryPink,
                 minimumSize: const Size.fromHeight(50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

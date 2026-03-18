@@ -52,12 +52,12 @@ class TroncheApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           brightness: Brightness.dark,
-          primaryColor: const Color(0xFF667EEA),
-          scaffoldBackgroundColor: const Color(0xFF111111),
+          primaryColor: AppColors.primaryPink,
+          scaffoldBackgroundColor: AppColors.background,
           fontFamily: 'System',
           colorScheme: const ColorScheme.dark(
-            primary: Color(0xFF667EEA),
-            secondary: Color(0xFF764BA2),
+            primary: AppColors.primaryPink,
+            secondary: AppColors.orange,
           ),
         ),
         home: const AppRoot(),
@@ -118,8 +118,29 @@ class _AppRootState extends State<AppRoot> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkSync());
 
     if (!appState.isInitialized) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/logo.png',
+                width: 180,
+                errorBuilder: (_, __, ___) => const Text(
+                  'Tronche!',
+                  style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.primaryPink,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              const CircularProgressIndicator(color: AppColors.primaryPink),
+            ],
+          ),
+        ),
       );
     }
 

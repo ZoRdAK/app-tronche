@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config.dart';
 import '../../providers/photo_state.dart';
 import '../shared/photo_viewer_screen.dart';
 
@@ -24,7 +25,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.surface,
         title: const Text('Supprimer la photo',
             style: TextStyle(color: Colors.white)),
         content: const Text(
@@ -57,9 +58,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
     final photos = photoState.photos;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.inputFill,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),

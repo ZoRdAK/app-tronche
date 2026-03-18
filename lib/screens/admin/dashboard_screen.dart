@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config.dart';
 import '../../providers/photo_state.dart';
 import '../../providers/sync_state.dart';
 import 'config_screen.dart';
@@ -18,9 +19,9 @@ class DashboardScreen extends StatelessWidget {
     final syncState = context.watch<SyncState>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.inputFill,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -41,7 +42,7 @@ class DashboardScreen extends StatelessWidget {
                 label: 'Photos prises',
                 value: '${photoState.photoCount}',
                 icon: Icons.photo_camera,
-                color: const Color(0xFF667EEA),
+                color: AppColors.primaryPink,
               ),
               const SizedBox(width: 8),
               _StatCard(
@@ -95,7 +96,7 @@ class DashboardScreen extends StatelessWidget {
                     height: 14,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Color(0xFF667EEA),
+                      color: AppColors.primaryPink,
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -165,8 +166,8 @@ class DashboardScreen extends StatelessWidget {
                 ..pop(); // AdminGateScreen
             },
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF667EEA),
-              side: const BorderSide(color: Color(0xFF667EEA)),
+              foregroundColor: AppColors.primaryPink,
+              side: const BorderSide(color: AppColors.primaryPink),
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -259,7 +260,7 @@ class _MenuTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading: Icon(icon, color: const Color(0xFF667EEA)),
+        leading: Icon(icon, color: AppColors.primaryPink),
         title: Text(label, style: const TextStyle(color: Colors.white)),
         trailing:
             const Icon(Icons.chevron_right, color: Colors.white38, size: 20),

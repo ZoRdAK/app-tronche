@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config.dart';
 import '../../providers/app_state.dart';
 
 class SubscriptionScreen extends StatelessWidget {
@@ -10,9 +11,9 @@ class SubscriptionScreen extends StatelessWidget {
     final plan = context.watch<AppState>().plan;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.inputFill,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -31,9 +32,7 @@ class SubscriptionScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                ),
+                gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Text(
@@ -76,7 +75,7 @@ class SubscriptionScreen extends StatelessWidget {
 
           _PlanCard(
             name: 'Premium',
-            color: const Color(0xFF667EEA),
+            color: AppColors.primaryPink,
             features: const [
               'Jusqu\'à 500 photos',
               'Tous les cadres',
@@ -90,7 +89,7 @@ class SubscriptionScreen extends StatelessWidget {
 
           _PlanCard(
             name: 'Pro',
-            color: const Color(0xFF764BA2),
+            color: AppColors.orange,
             features: const [
               'Photos illimitées',
               'Tous les cadres',
@@ -112,12 +111,12 @@ class SubscriptionScreen extends StatelessWidget {
               color: const Color(0xFF1E1E1E),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                  color: const Color(0xFF667EEA).withAlpha(80)),
+                  color: AppColors.primaryPink.withAlpha(80)),
             ),
             child: Column(
               children: [
                 const Icon(Icons.diamond_outlined,
-                    color: Color(0xFF667EEA), size: 40),
+                    color: AppColors.primaryPink, size: 40),
                 const SizedBox(height: 12),
                 const Text(
                   'Les achats in-app seront disponibles prochainement',
@@ -138,19 +137,19 @@ class SubscriptionScreen extends StatelessWidget {
                 if (plan == 'free') ...[
                   _UpgradeButton(
                     label: 'Passer en Premium',
-                    color: const Color(0xFF667EEA),
+                    color: AppColors.primaryPink,
                     onTap: () => _showComingSoon(context),
                   ),
                   const SizedBox(height: 8),
                   _UpgradeButton(
                     label: 'Passer en Pro',
-                    color: const Color(0xFF764BA2),
+                    color: AppColors.orange,
                     onTap: () => _showComingSoon(context),
                   ),
                 ] else if (plan == 'premium')
                   _UpgradeButton(
                     label: 'Passer en Pro',
-                    color: const Color(0xFF764BA2),
+                    color: AppColors.orange,
                     onTap: () => _showComingSoon(context),
                   ),
               ],

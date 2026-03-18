@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../config.dart';
 import '../../providers/app_state.dart';
 
 class OnlineGalleryScreen extends StatelessWidget {
@@ -15,9 +16,9 @@ class OnlineGalleryScreen extends StatelessWidget {
     final galleryUrl = 'https://tronche.zordak.fr/g/$shareCode';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF111111),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.inputFill,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -84,7 +85,7 @@ class OnlineGalleryScreen extends StatelessWidget {
                   child: Text(
                     galleryUrl,
                     style: const TextStyle(
-                      color: Color(0xFF667EEA),
+                      color: AppColors.primaryPink,
                       fontSize: 13,
                     ),
                     textAlign: TextAlign.center,
@@ -110,7 +111,7 @@ class OnlineGalleryScreen extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF667EEA),
+                    backgroundColor: AppColors.primaryPink,
                     minimumSize: const Size.fromHeight(50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -130,13 +131,13 @@ class OnlineGalleryScreen extends StatelessWidget {
                     }
                   },
                   icon: const Icon(Icons.open_in_browser,
-                      color: Color(0xFF667EEA)),
+                      color: AppColors.primaryPink),
                   label: const Text(
                     'Ouvrir dans le navigateur',
-                    style: TextStyle(color: Color(0xFF667EEA)),
+                    style: TextStyle(color: AppColors.primaryPink),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF667EEA)),
+                    side: const BorderSide(color: AppColors.primaryPink),
                     minimumSize: const Size.fromHeight(50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
