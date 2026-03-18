@@ -7,6 +7,7 @@ import '../services/database_service.dart';
 class SyncState extends ChangeNotifier {
   final DatabaseService _db = DatabaseService();
 
+  bool _disposed = false;
   bool _isOnline = false;
   bool _isSyncing = false;
   int _pendingSyncCount = 0;
@@ -15,6 +16,7 @@ class SyncState extends ChangeNotifier {
 
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
+  bool get isDisposed => _disposed;
   bool get isOnline => _isOnline;
   bool get isSyncing => _isSyncing;
   int get pendingSyncCount => _pendingSyncCount;
@@ -22,6 +24,7 @@ class SyncState extends ChangeNotifier {
   List<SendQueueItem> get queueItems => List.unmodifiable(_queueItems);
 
   set isSyncing(bool value) {
+    if (_disposed) return;
     _isSyncing = value;
     notifyListeners();
   }
@@ -62,6 +65,7 @@ class SyncState extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     _connectivitySubscription?.cancel();
     super.dispose();
   }

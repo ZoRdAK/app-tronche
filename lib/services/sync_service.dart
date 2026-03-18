@@ -49,8 +49,9 @@ class SyncService {
   // ────────────────────────────────────────────────────────────────────────────
 
   Future<void> _runSync() async {
-    // Guard: skip if already syncing or offline.
+    // Guard: skip if already syncing or offline or provider disposed.
     if (_isSyncing) return;
+    if (_syncState.isDisposed) return;
     if (!_syncState.isOnline) return;
 
     _isSyncing = true;
@@ -61,11 +62,13 @@ class SyncService {
       await _processEmailQueue();
     } finally {
       _isSyncing = false;
-      _syncState.isSyncing = false;
-      // Refresh counts in both states so the UI stays up to date.
+      if (!_syncState.isDisposed) {
+        _syncState.isSyncing = false;
+        // Refresh counts in both states so the UI stays up to date.
+        await _syncState.loadCounts();
+        await _syncState.loadQueueItems();
+      }
       await _photoState.refreshCounts();
-      await _syncState.loadCounts();
-      await _syncState.loadQueueItems();
     }
   }
 

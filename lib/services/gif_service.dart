@@ -1,7 +1,62 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:camera/camera.dart';
+
+// ---------------------------------------------------------------------------
+// Top-level function required by compute() — runs in a background isolate.
+// Receives frame file paths and returns the encoded GIF bytes synchronously.
+// ---------------------------------------------------------------------------
+Uint8List _assembleGifIsolate(Map<String, dynamic> params) {
+  final paths = List<String>.from(params['paths'] as List);
+  final mirrorHorizontal = params['mirrorHorizontal'] as bool;
+
+  img.Image? loadAndProcess(String path) {
+    final bytes = File(path).readAsBytesSync();
+    var image = img.decodeImage(bytes);
+    if (image == null) return null;
+    if (mirrorHorizontal) {
+      image = img.flipHorizontal(image);
+    }
+    return img.copyResize(image, width: 720);
+  }
+
+  img.Image? animation;
+
+  // Forward frames
+  for (final path in paths) {
+    final image = loadAndProcess(path);
+    if (image == null) continue;
+    image.frameDuration = 300; // 300ms per frame (snappier)
+
+    if (animation == null) {
+      animation = image;
+      animation.frameType = img.FrameType.animation;
+      animation.loopCount = 0; // loop forever
+    } else {
+      animation.addFrame(image);
+    }
+  }
+
+  // Reverse frames for boomerang (skip first and last to avoid duplicates)
+  for (int i = paths.length - 2; i > 0; i--) {
+    final image = loadAndProcess(paths[i]);
+    if (image == null) continue;
+    image.frameDuration = 300;
+    animation?.addFrame(image);
+  }
+
+  if (animation == null) {
+    throw Exception('GIF assembly failed: no frames decoded');
+  }
+
+  return Uint8List.fromList(img.encodeGif(animation, samplingFactor: 1));
+}
+
+// ---------------------------------------------------------------------------
+// Service class
+// ---------------------------------------------------------------------------
 
 class GifService {
   /// Captures [frameCount] frames from the camera and assembles
@@ -31,56 +86,22 @@ class GifService {
     List<XFile> frames, {
     bool mirrorHorizontal = true,
   }) async {
-    img.Image? animation;
+    // Extract paths — XFile cannot cross isolate boundaries.
+    final paths = frames.map((f) => f.path).toList();
 
-    Future<img.Image?> loadAndProcess(String path) async {
-      final bytes = await File(path).readAsBytes();
-      var image = img.decodeImage(bytes);
-      if (image == null) return null;
+    // Run CPU-intensive GIF encoding in a background isolate.
+    final gifBytes = await compute(_assembleGifIsolate, {
+      'paths': paths,
+      'mirrorHorizontal': mirrorHorizontal,
+    });
 
-      // Mirror for front camera
-      if (mirrorHorizontal) {
-        image = img.flipHorizontal(image);
-      }
-
-      // Resize to 720px wide for decent quality GIF
-      return img.copyResize(image, width: 720);
-    }
-
-    // Forward frames
-    for (final frame in frames) {
-      final image = await loadAndProcess(frame.path);
-      if (image == null) continue;
-      image.frameDuration = 300; // 300ms per frame (snappier)
-
-      if (animation == null) {
-        animation = image;
-        animation.frameType = img.FrameType.animation;
-        animation.loopCount = 0; // loop forever
-      } else {
-        animation.addFrame(image);
-      }
-    }
-
-    // Reverse frames for boomerang (skip first and last to avoid duplicates)
-    for (int i = frames.length - 2; i > 0; i--) {
-      final image = await loadAndProcess(frames[i].path);
-      if (image == null) continue;
-      image.frameDuration = 300;
-      animation?.addFrame(image);
-    }
-
-    if (animation == null) {
-      throw Exception('GIF assembly failed: no frames decoded');
-    }
-
-    final gif = img.encodeGif(animation, samplingFactor: 1);
-
+    // Write output file and clean up temp frames on the main isolate
+    // (getApplicationDocumentsDirectory uses platform channels).
     final dir = await getApplicationDocumentsDirectory();
     final gifPath =
         '${dir.path}/photos/gif_${DateTime.now().millisecondsSinceEpoch}.gif';
     await Directory('${dir.path}/photos').create(recursive: true);
-    await File(gifPath).writeAsBytes(gif);
+    await File(gifPath).writeAsBytes(gifBytes);
 
     // Clean up temp frame files
     for (final frame in frames) {

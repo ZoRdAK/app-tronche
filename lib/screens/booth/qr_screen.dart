@@ -61,7 +61,7 @@ class _QrScreenState extends State<QrScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Text(
-                  'Scannez pour recuperer votre photo',
+                  'Scannez pour récupérer votre photo',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -71,7 +71,7 @@ class _QrScreenState extends State<QrScreen> {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'Votre photo sera disponible tres bientot a cette adresse !',
+                  'Votre photo sera disponible très bientôt à cette adresse !',
                   style: TextStyle(color: Colors.white54, fontSize: 15),
                   textAlign: TextAlign.center,
                 ),
@@ -107,7 +107,7 @@ class _QrScreenState extends State<QrScreen> {
                       SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Gardez ce lien — la photo y apparaitra automatiquement',
+                          'Gardez ce lien — la photo y apparaîtra automatiquement',
                           style: TextStyle(
                             color: Color(0xFF5BC8F5),
                             fontSize: 13,
