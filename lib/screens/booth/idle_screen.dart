@@ -84,11 +84,19 @@ class _IdleScreenState extends State<IdleScreen> {
         .map((p) => p.localPath)
         .toList();
 
-    // Fallback: camera preview
+    // Fallback: camera preview (Bug 2 fix: correct aspect ratio)
     Widget cameraFallback;
     if (_cameraReady && _cameraService.controller != null) {
+      final ctrl = _cameraService.controller!;
       cameraFallback = SizedBox.expand(
-        child: CameraPreview(_cameraService.controller!),
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: ctrl.value.previewSize!.height,
+            height: ctrl.value.previewSize!.width,
+            child: CameraPreview(ctrl),
+          ),
+        ),
       );
     } else {
       cameraFallback = Container(color: const Color(0xFF111111));
@@ -168,33 +176,37 @@ class _IdleScreenState extends State<IdleScreen> {
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // CTA button
-                  GestureDetector(
-                    onTap: _startPhotobooth,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 18),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                        ),
-                        borderRadius: BorderRadius.circular(50),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF667EEA).withAlpha(100),
-                            blurRadius: 20,
-                            spreadRadius: 2,
+                  // CTA button (Bug 10: centered)
+                  Center(
+                    child: GestureDetector(
+                      onTap: _startPhotobooth,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 40, vertical: 18),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                           ),
-                        ],
-                      ),
-                      child: const Text(
-                        'Touchez pour commencer',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.3,
+                          borderRadius: BorderRadius.circular(50),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF667EEA).withAlpha(100),
+                              blurRadius: 20,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: const Text(
+                          'Touchez pour commencer',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),

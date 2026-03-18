@@ -22,6 +22,10 @@ class _AdminGateScreenState extends State<AdminGateScreen>
   AnimationController? _shakeController;
   Animation<double>? _shakeAnim;
 
+  // Bug 9: Support 4-6 digit PINs
+  static const int _minDigits = 4;
+  static const int _maxDigits = 6;
+
   @override
   void initState() {
     super.initState();
@@ -43,9 +47,10 @@ class _AdminGateScreenState extends State<AdminGateScreen>
   }
 
   void _onKey(String digit) {
-    if (_input.length >= 6) return;
+    if (_input.length >= _maxDigits) return;
     setState(() => _input += digit);
-    if (_input.length >= 4) {
+    // Bug 9: Auto-submit after each digit from 4 onwards
+    if (_input.length >= _minDigits) {
       _trySubmit();
     }
   }
@@ -64,7 +69,7 @@ class _AdminGateScreenState extends State<AdminGateScreen>
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const DashboardScreen()),
       );
-    } else if (_input.length >= 6) {
+    } else if (_input.length >= _maxDigits) {
       _failedAttempt();
     }
   }
@@ -91,6 +96,7 @@ class _AdminGateScreenState extends State<AdminGateScreen>
           'Administration',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
+        centerTitle: true,
       ),
       body: SafeArea(
         child: Column(
@@ -103,14 +109,16 @@ class _AdminGateScreenState extends State<AdminGateScreen>
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             const Text(
-              'Saisissez votre code PIN',
+              'Saisissez votre code PIN (4-6 chiffres)',
               style: TextStyle(color: Colors.white54, fontSize: 14),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
-            // PIN dots with shake animation
+            // Bug 9: PIN dots (4-6) with shake animation
             AnimatedBuilder(
               animation: _shakeAnim ?? const AlwaysStoppedAnimation(0),
               builder: (_, __) => Transform.translate(
@@ -122,21 +130,28 @@ class _AdminGateScreenState extends State<AdminGateScreen>
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(6, (i) {
+                  children: List.generate(_maxDigits, (i) {
                     final filled = i < _input.length;
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: filled
-                            ? const Color(0xFF667EEA)
-                            : const Color(0xFF2A2A2A),
-                        border: Border.all(
+                    // Dots 0-3 are always visible, dots 4-5 appear when needed
+                    final isOptional = i >= _minDigits;
+                    final showDot = !isOptional || _input.length > i - 1;
+                    return AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: showDot ? 1.0 : 0.3,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
                           color: filled
                               ? const Color(0xFF667EEA)
-                              : const Color(0xFF444444),
+                              : const Color(0xFF2A2A2A),
+                          border: Border.all(
+                            color: filled
+                                ? const Color(0xFF667EEA)
+                                : const Color(0xFF444444),
+                          ),
                         ),
                       ),
                     );

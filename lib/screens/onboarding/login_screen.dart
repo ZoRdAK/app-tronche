@@ -54,6 +54,20 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = data['user'] as Map<String, dynamic>? ?? {};
       final plan = user['plan'] as String? ?? 'free';
 
+      // Save a minimal config so the API interceptor can use the JWT token
+      final tempConfig = EventConfig(
+        userEmail: _emailCtrl.text.trim(),
+        jwtToken: token,
+        refreshToken: refreshToken,
+        name1: '',
+        name2: '',
+        eventDate: '',
+        adminPasswordHash: '',
+        shareCode: '',
+        plan: plan,
+      );
+      await db.saveEventConfig(tempConfig);
+
       // Try to fetch existing events
       Map<String, dynamic>? firstEvent;
       try {

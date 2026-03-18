@@ -101,10 +101,19 @@ class _CountdownScreenState extends State<CountdownScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Camera preview
+          // Camera preview (Bug 2 fix: correct aspect ratio)
           if (widget.cameraService.isInitialized &&
               widget.cameraService.controller != null)
-            CameraPreview(widget.cameraService.controller!),
+            SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: widget.cameraService.controller!.value.previewSize!.height,
+                  height: widget.cameraService.controller!.value.previewSize!.width,
+                  child: CameraPreview(widget.cameraService.controller!),
+                ),
+              ),
+            ),
 
           // Countdown number
           CountdownOverlay(currentNumber: _currentCount),

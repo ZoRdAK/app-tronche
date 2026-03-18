@@ -15,8 +15,13 @@ import 'qr_screen.dart';
 
 class PreviewScreen extends StatefulWidget {
   final String compositedPhotoPath;
+  final String? rawPhotoPath;
 
-  const PreviewScreen({super.key, required this.compositedPhotoPath});
+  const PreviewScreen({
+    super.key,
+    required this.compositedPhotoPath,
+    this.rawPhotoPath,
+  });
 
   @override
   State<PreviewScreen> createState() => _PreviewScreenState();
@@ -27,12 +32,15 @@ class _PreviewScreenState extends State<PreviewScreen> {
   int? _savedPhotoId;
   bool _isSaving = true;
   bool _showUpgradePrompt = false;
+  late String _displayPhotoPath;
 
   @override
   void initState() {
     super.initState();
     _photoCode = _generatePhotoCode();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _savePhoto());
+    // Show raw photo immediately for fast transition (Bug 3 fix)
+    _displayPhotoPath = widget.rawPhotoPath ?? widget.compositedPhotoPath;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _compositeAndSave());
   }
 
   String _generatePhotoCode() {
@@ -42,7 +50,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
     return List.generate(20, (_) => chars[rng.nextInt(chars.length)]).join();
   }
 
-  Future<void> _savePhoto() async {
+  Future<void> _compositeAndSave() async {
     final appState = context.read<AppState>();
     final photoState = context.read<PhotoState>();
     final config = appState.eventConfig;
@@ -62,18 +70,35 @@ class _PreviewScreenState extends State<PreviewScreen> {
       return;
     }
 
-    // Generate thumbnail
+    // Composite overlay asynchronously (Bug 3 fix)
     final overlayService = OverlayService();
+    final addWatermark = config.plan == 'free';
+    String compositedPath;
+    try {
+      compositedPath = await overlayService.compositePhoto(
+        widget.rawPhotoPath ?? widget.compositedPhotoPath,
+        config,
+        addWatermark,
+      );
+    } catch (_) {
+      compositedPath = widget.rawPhotoPath ?? widget.compositedPhotoPath;
+    }
+
+    // Update display with composited photo
+    if (mounted) {
+      setState(() => _displayPhotoPath = compositedPath);
+    }
+
+    // Generate thumbnail
     String? thumbnailPath;
     try {
-      thumbnailPath =
-          await overlayService.generateThumbnail(widget.compositedPhotoPath);
+      thumbnailPath = await overlayService.generateThumbnail(compositedPath);
     } catch (_) {
       thumbnailPath = null;
     }
 
     final photo = Photo(
-      localPath: widget.compositedPhotoPath,
+      localPath: compositedPath,
       thumbnailPath: thumbnailPath,
       photoCode: _photoCode,
       takenAt: DateTime.now(),
@@ -109,7 +134,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
         children: [
           // Photo
           Image.file(
-            File(widget.compositedPhotoPath),
+            File(_displayPhotoPath),
             fit: BoxFit.contain,
           ),
 
@@ -201,8 +226,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
             (route) => false,
           ),
           child: const Text(
-            'Passer →',
+            'Passer',
             style: TextStyle(color: Colors.white54, fontSize: 16),
+            textAlign: TextAlign.center,
           ),
         ),
       ],
@@ -219,30 +245,35 @@ class _PreviewScreenState extends State<PreviewScreen> {
           'Limite de photos atteinte',
           style: TextStyle(
               color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         const Text(
-          'Passez à Premium pour des photos illimitées.',
+          'Passez a Premium pour des photos illimitees.',
           style: TextStyle(color: Colors.white54, fontSize: 14),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).pushNamed('/subscription'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF667EEA),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+        Center(
+          child: ElevatedButton(
+            onPressed: () => Navigator.of(context).pushNamed('/subscription'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF667EEA),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Voir les offres'),
           ),
-          child: const Text('Voir les offres'),
         ),
-        TextButton(
-          onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const IdleScreen()),
-            (route) => false,
+        Center(
+          child: TextButton(
+            onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const IdleScreen()),
+              (route) => false,
+            ),
+            child: const Text("Retour a l'accueil",
+                style: TextStyle(color: Colors.white38)),
           ),
-          child: const Text('Retour à l\'accueil',
-              style: TextStyle(color: Colors.white38)),
         ),
       ],
     );
@@ -281,6 +312,7 @@ class _ActionButton extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(color: Colors.white70, fontSize: 13),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

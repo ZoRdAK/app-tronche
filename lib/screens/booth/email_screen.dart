@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../models/send_queue_item.dart';
 import '../../services/database_service.dart';
-import 'idle_screen.dart';
+import 'camera_screen.dart';
 
 class EmailScreen extends StatefulWidget {
   final String photoCode;
@@ -56,21 +56,16 @@ class _EmailScreenState extends State<EmailScreen> {
         _isSending = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Photo ajoutée à la file d\'envoi !'),
-          backgroundColor: Color(0xFF1E3A2A),
-        ),
-      );
+      // Bug 7 fix: No SnackBar — success is shown directly in the UI
 
-      // Auto-return after 5 seconds
+      // Bug 8 fix: Auto-return countdown to camera (not idle)
       _autoReturnTimer =
           Timer.periodic(const Duration(seconds: 1), (_) {
         if (!mounted) return;
         setState(() => _autoReturnSeconds--);
         if (_autoReturnSeconds <= 0) {
           _autoReturnTimer?.cancel();
-          _goToIdle();
+          _goToCamera();
         }
       });
     } catch (e) {
@@ -86,11 +81,11 @@ class _EmailScreenState extends State<EmailScreen> {
     }
   }
 
-  void _goToIdle() {
+  void _goToCamera() {
     if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const IdleScreen()),
-      (route) => false,
+    // Bug 8 fix: navigate back to CameraScreen instead of idle
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const CameraScreen()),
     );
   }
 
@@ -102,15 +97,18 @@ class _EmailScreenState extends State<EmailScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 32),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Back button
-              TextButton.icon(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.arrow_back_ios,
-                    color: Colors.white54, size: 16),
-                label: const Text('Retour',
-                    style: TextStyle(color: Colors.white54)),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back_ios,
+                      color: Colors.white54, size: 16),
+                  label: const Text('Retour',
+                      style: TextStyle(color: Colors.white54)),
+                ),
               ),
               const Spacer(),
 
@@ -122,6 +120,7 @@ class _EmailScreenState extends State<EmailScreen> {
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 // Email field
@@ -161,8 +160,9 @@ class _EmailScreenState extends State<EmailScreen> {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'Votre email sera uniquement utilisé pour vous envoyer cette photo.',
+                  'Votre email sera uniquement utilise pour vous envoyer cette photo.',
                   style: TextStyle(color: Color(0xFF666666), fontSize: 13),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 SizedBox(
@@ -212,47 +212,43 @@ class _EmailScreenState extends State<EmailScreen> {
                         ),
                 ),
               ] else ...[
-                // Sent confirmation
-                const Center(
-                  child: Icon(Icons.check_circle_outline,
-                      color: Color(0xFF4CAF50), size: 80),
-                ),
+                // Sent confirmation (Bug 7: shown directly, no snackbar)
+                const Icon(Icons.check_circle_outline,
+                    color: Color(0xFF4CAF50), size: 80),
                 const SizedBox(height: 24),
-                const Center(
-                  child: Text(
-                    'Photo en route !',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
-                    ),
+                const Text(
+                  'Photo en route !',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                const Center(
-                  child: Text(
-                    'La photo sera envoyée dès que possible.',
-                    style: TextStyle(color: Colors.white54, fontSize: 15),
-                    textAlign: TextAlign.center,
-                  ),
+                const Text(
+                  'La photo sera envoyee des que possible.',
+                  style: TextStyle(color: Colors.white54, fontSize: 15),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
-                Center(
-                  child: Text(
-                    'Retour dans ${_autoReturnSeconds}s',
-                    style: const TextStyle(
-                        color: Colors.white38, fontSize: 14),
+                // Bug 8 fix: visible live countdown
+                Text(
+                  'Retour dans ${_autoReturnSeconds}s...',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-                Center(
-                  child: TextButton(
-                    onPressed: _goToIdle,
-                    child: const Text(
-                      'Retour à l\'accueil →',
-                      style: TextStyle(
-                          color: Color(0xFF667EEA), fontSize: 16),
-                    ),
+                TextButton(
+                  onPressed: _goToCamera,
+                  child: const Text(
+                    'Prendre une autre photo',
+                    style: TextStyle(
+                        color: Color(0xFF667EEA), fontSize: 16),
                   ),
                 ),
               ],
