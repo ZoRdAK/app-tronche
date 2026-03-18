@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 import '../../providers/app_state.dart';
 import '../../services/api_service.dart';
 import '../../services/database_service.dart';
@@ -122,6 +124,15 @@ class _LoginScreenState extends State<LoginScreen> {
       if (firstEvent != null &&
           config.name1.isNotEmpty &&
           config.name2.isNotEmpty) {
+        // Ask user to re-enter their admin PIN (bcrypt hash from server can't be used locally)
+        if (!mounted) return;
+        final pin = await _askAdminPin();
+        if (pin != null && pin.length >= 4 && mounted) {
+          final pinHash = sha256.convert(utf8.encode(pin)).toString();
+          final updatedConfig = config.copyWith(adminPasswordHash: pinHash);
+          await context.read<AppState>().setEventConfig(updatedConfig);
+        }
+        if (!mounted) return;
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const IdleScreen()),
           (route) => false,
@@ -138,6 +149,60 @@ class _LoginScreenState extends State<LoginScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<String?> _askAdminPin() async {
+    final pinCtrl = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E2E),
+        title: const Text('Code administrateur',
+            style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Saisissez votre code PIN pour accéder à l\'administration sur cet appareil.',
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: pinCtrl,
+              keyboardType: TextInputType.number,
+              obscureText: true,
+              maxLength: 6,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white, fontSize: 24, letterSpacing: 8),
+              textAlign: TextAlign.center,
+              decoration: InputDecoration(
+                hintText: '••••',
+                hintStyle: const TextStyle(color: Color(0xFF444444)),
+                counterText: '',
+                filled: true,
+                fillColor: const Color(0xFF111111),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF667EEA)),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, null),
+            child: const Text('Passer', style: TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, pinCtrl.text),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF667EEA)),
+            child: const Text('Valider'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _forgotPassword() async {
