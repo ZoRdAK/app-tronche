@@ -1,0 +1,2 @@
+json_key_file("fastlane/play-store-key.json")  # Will need to be created
+package_name("com.karlcosse.tronche")

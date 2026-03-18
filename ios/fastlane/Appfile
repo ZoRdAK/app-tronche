@@ -1,0 +1,3 @@
+app_identifier("com.karlcosse.tronche")
+apple_id("karl.cosse@gmail.com")  # May need to adjust
+team_id("PN4VY6TUWD")

@@ -1,0 +1,44 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to App Store Connect (TestFlight)"
+  lane :beta do
+    # Build Flutter app first
+    Dir.chdir("..") do
+      sh("fvm flutter build ios --release --no-codesign")
+    end
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      output_directory: "../build/ios",
+      output_name: "Tronche.ipa",
+    )
+
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc "Build and upload to App Store for release"
+  lane :release do
+    Dir.chdir("..") do
+      sh("fvm flutter build ios --release --no-codesign")
+    end
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      output_directory: "../build/ios",
+      output_name: "Tronche.ipa",
+    )
+
+    upload_to_app_store(
+      skip_metadata: false,
+      skip_screenshots: true,
+      force: true,
+    )
+  end
+end
