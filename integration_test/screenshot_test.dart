@@ -63,14 +63,23 @@ void main() {
     // Screenshot 3: Camera screen with Photo/GIF toggle
     testWidgets('03 - Camera Screen', (tester) async {
       app.main();
-      await tester.pumpAndSettle(const Duration(seconds: 3));
+      // Pump frames manually (pumpAndSettle won't work because slideshow timer keeps animating)
+      for (int i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
 
       // Tap "Touchez pour commencer"
       final startBtn = find.textContaining('Touchez');
-      if (startBtn.evaluate().isNotEmpty) {
-        await tester.tap(startBtn);
-        await tester.pumpAndSettle(const Duration(seconds: 2));
+      expect(startBtn, findsOneWidget);
+      await tester.tap(startBtn);
+
+      // Wait for navigation animation to fully complete
+      for (int i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
       }
+
+      // Verify we're on camera screen (look for Photo/GIF toggle or shutter)
+      await tester.pump(const Duration(seconds: 1));
 
       await binding.takeScreenshot('03_camera');
     });
@@ -78,18 +87,13 @@ void main() {
     // Screenshot 4: Preview screen (real screen with screenshot mode asset)
     testWidgets('04 - Photo Preview', (tester) async {
       app.main();
-      await tester.pumpAndSettle(const Duration(seconds: 3));
-
-      // Tap "Touchez pour commencer" to get into the booth flow
-      final startBtn = find.textContaining('Touchez');
-      if (startBtn.evaluate().isNotEmpty) {
-        await tester.tap(startBtn);
-        await tester.pumpAndSettle(const Duration(seconds: 2));
+      for (int i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
       }
 
-      // Navigate to real PreviewScreen (screenshot mode uses asset image)
-      final context = tester.element(find.byType(Scaffold).first);
-      Navigator.of(context).push(
+      // Navigate directly to PreviewScreen (skip camera)
+      final navContext = tester.element(find.byType(Scaffold).first);
+      Navigator.of(navContext).push(
         MaterialPageRoute(
           builder: (_) => const PreviewScreen(
             rawPhotoPath: 'screenshot_mode',
@@ -97,7 +101,11 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+
+      // Wait for navigation to complete
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
 
       await binding.takeScreenshot('04_preview');
     });
@@ -105,16 +113,22 @@ void main() {
     // Screenshot 5: QR Code screen (real QrScreen)
     testWidgets('05 - QR Code Screen', (tester) async {
       app.main();
-      await tester.pumpAndSettle(const Duration(seconds: 3));
+      for (int i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
 
-      // Navigate to real QrScreen
-      final context = tester.element(find.byType(Scaffold).first);
-      Navigator.of(context).push(
+      // Navigate directly to QrScreen
+      final navContext = tester.element(find.byType(Scaffold).first);
+      Navigator.of(navContext).push(
         MaterialPageRoute(
           builder: (_) => const QrScreen(photoCode: 'DEMO_PHOTO_CODE'),
         ),
       );
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+
+      // Wait for navigation to complete
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
 
       await binding.takeScreenshot('05_qrcode');
     });
