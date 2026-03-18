@@ -57,9 +57,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _passwordCtrl.text,
       );
 
-      final token = data['token'] as String? ?? '';
+      final token = data['accessToken'] as String? ?? '';
       final refreshToken = data['refreshToken'] as String? ?? '';
-      final plan = data['plan'] as String? ?? 'free';
+      final user = data['user'] as Map<String, dynamic>? ?? {};
+      final plan = user['plan'] as String? ?? 'free';
 
       final shell = EventConfig(
         userEmail: _emailCtrl.text.trim(),

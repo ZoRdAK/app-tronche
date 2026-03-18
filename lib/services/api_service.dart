@@ -77,6 +77,7 @@ class ApiService {
       final response = await _dio.post('/api/auth/register', data: {
         'email': email,
         'password': password,
+        'cguAccepted': true,
       });
       return Map<String, dynamic>.from(response.data);
     } on DioException catch (e) {
@@ -121,7 +122,7 @@ class ApiService {
     try {
       await _dio.post('/api/auth/reset-password', data: {
         'token': token,
-        'password': newPassword,
+        'newPassword': newPassword,
       });
     } on DioException catch (e) {
       throw _formatError(e, 'Password reset failed');
@@ -165,10 +166,10 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> getEvents() async {
+  Future<List<dynamic>> getEvents() async {
     try {
       final response = await _dio.get('/api/events');
-      return Map<String, dynamic>.from(response.data);
+      return List<dynamic>.from(response.data);
     } on DioException catch (e) {
       throw _formatError(e, 'Failed to fetch events');
     }
@@ -183,12 +184,11 @@ class ApiService {
   }) async {
     try {
       final formData = FormData.fromMap({
-        'eventId': eventId,
         'takenAt': takenAt,
         'photo': await MultipartFile.fromFile(filePath),
       });
       final response = await _dio.post(
-        '/api/photos/upload',
+        '/api/events/$eventId/photos',
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
@@ -205,7 +205,8 @@ class ApiService {
     required String recipient,
   }) async {
     try {
-      await _dio.post('/api/queue/email', data: {
+      await _dio.post('/api/send-queue', data: {
+        'type': 'email',
         'photoId': photoId,
         'recipient': recipient,
       });
@@ -218,8 +219,8 @@ class ApiService {
 
   Future<void> changeEmail(String newEmail, String password) async {
     try {
-      await _dio.put('/api/auth/change-email', data: {
-        'email': newEmail,
+      await _dio.put('/api/auth/email', data: {
+        'newEmail': newEmail,
         'password': password,
       });
     } on DioException catch (e) {
@@ -232,7 +233,7 @@ class ApiService {
     String newPassword,
   ) async {
     try {
-      await _dio.put('/api/auth/change-password', data: {
+      await _dio.put('/api/auth/password', data: {
         'currentPassword': currentPassword,
         'newPassword': newPassword,
       });
@@ -266,14 +267,23 @@ class ApiService {
         ? (e.response!.data['message'] ?? e.response!.data['error'] ?? fallback)
         : fallback;
     if (statusCode == 409) {
-      return Exception('This email is already registered.');
+      return Exception('Cet email est déjà utilisé.');
     }
     if (statusCode == 401) {
-      return Exception('Invalid credentials.');
+      return Exception('Email ou mot de passe incorrect.');
+    }
+    if (statusCode == 400) {
+      return Exception('Vérifiez les informations saisies.');
+    }
+    if (statusCode == 403) {
+      return Exception('Limite atteinte pour votre offre.');
     }
     if (statusCode == 404) {
-      return Exception('Not found.');
+      return Exception('Ressource introuvable.');
     }
-    return Exception('$message (HTTP $statusCode)');
+    if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.connectionError) {
+      return Exception('Impossible de se connecter au serveur. Vérifiez votre connexion.');
+    }
+    return Exception(message);
   }
 }

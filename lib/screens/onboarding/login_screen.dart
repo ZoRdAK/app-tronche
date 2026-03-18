@@ -49,15 +49,15 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordCtrl.text,
       );
 
-      final token = data['token'] as String? ?? '';
+      final token = data['accessToken'] as String? ?? '';
       final refreshToken = data['refreshToken'] as String? ?? '';
-      final plan = data['plan'] as String? ?? 'free';
+      final user = data['user'] as Map<String, dynamic>? ?? {};
+      final plan = user['plan'] as String? ?? 'free';
 
       // Try to fetch existing events
       Map<String, dynamic>? firstEvent;
       try {
-        final eventsData = await api.getEvents();
-        final events = eventsData['events'] as List<dynamic>? ?? [];
+        final events = await api.getEvents();
         if (events.isNotEmpty) {
           firstEvent = Map<String, dynamic>.from(events.first as Map);
         }
