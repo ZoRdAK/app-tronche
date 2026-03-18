@@ -4,13 +4,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:camera/camera.dart';
 
 class GifService {
-  /// Captures [frameCount] frames from the camera over ~2 seconds and assembles
+  /// Captures [frameCount] frames from the camera and assembles
   /// them into an animated GIF with a boomerang effect.
-  /// Returns the path to the saved GIF file.
   static Future<String> captureGif(
     CameraController controller, {
     int frameCount = 4,
-    Duration intervalBetweenFrames = const Duration(milliseconds: 500),
+    Duration intervalBetweenFrames = const Duration(milliseconds: 350),
+    bool mirrorHorizontal = true,
     void Function(int captured, int total)? onFrameCaptured,
   }) async {
     final frames = <XFile>[];
@@ -24,27 +24,34 @@ class GifService {
       }
     }
 
-    return await _assembleGif(frames);
+    return await _assembleGif(frames, mirrorHorizontal: mirrorHorizontal);
   }
 
-  static Future<String> _assembleGif(List<XFile> frames) async {
-    // image v4: use Image with frameType.animation as the animation container.
-    // The first frame becomes the "root" image; subsequent frames are added via addFrame().
-    // frameDuration is in milliseconds; the GIF encoder converts it to 1/100 sec internally.
+  static Future<String> _assembleGif(
+    List<XFile> frames, {
+    bool mirrorHorizontal = true,
+  }) async {
     img.Image? animation;
 
-    Future<img.Image?> loadAndResize(String path) async {
+    Future<img.Image?> loadAndProcess(String path) async {
       final bytes = await File(path).readAsBytes();
       var image = img.decodeImage(bytes);
       if (image == null) return null;
-      return img.copyResize(image, width: 480);
+
+      // Mirror for front camera
+      if (mirrorHorizontal) {
+        image = img.flipHorizontal(image);
+      }
+
+      // Resize to 720px wide for decent quality GIF
+      return img.copyResize(image, width: 720);
     }
 
     // Forward frames
     for (final frame in frames) {
-      final image = await loadAndResize(frame.path);
+      final image = await loadAndProcess(frame.path);
       if (image == null) continue;
-      image.frameDuration = 500; // 500ms per frame
+      image.frameDuration = 300; // 300ms per frame (snappier)
 
       if (animation == null) {
         animation = image;
@@ -55,11 +62,11 @@ class GifService {
       }
     }
 
-    // Reverse frames for boomerang effect (skip first and last to avoid duplicates)
+    // Reverse frames for boomerang (skip first and last to avoid duplicates)
     for (int i = frames.length - 2; i > 0; i--) {
-      final image = await loadAndResize(frames[i].path);
+      final image = await loadAndProcess(frames[i].path);
       if (image == null) continue;
-      image.frameDuration = 500;
+      image.frameDuration = 300;
       animation?.addFrame(image);
     }
 
@@ -67,7 +74,7 @@ class GifService {
       throw Exception('GIF assembly failed: no frames decoded');
     }
 
-    final gif = img.encodeGif(animation);
+    final gif = img.encodeGif(animation, samplingFactor: 1);
 
     final dir = await getApplicationDocumentsDirectory();
     final gifPath =
