@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:integration_test/integration_test_driver_extended.dart';
 
 Future<void> main() async {
@@ -8,7 +9,7 @@ Future<void> main() async {
       if (!dir.existsSync()) dir.createSync(recursive: true);
       final file = File('${dir.path}/$screenshotName.png');
       file.writeAsBytesSync(screenshotBytes);
-      print('Screenshot saved: ${file.path}');
+      debugPrint('Screenshot saved: ${file.path}');
       return true;
     },
   );
