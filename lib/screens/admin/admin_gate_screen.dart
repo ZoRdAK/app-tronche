@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:crypto/crypto.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'dart:convert';
 import '../../providers/app_state.dart';
 import 'dashboard_screen.dart';
@@ -24,6 +25,8 @@ class _AdminGateScreenState extends State<AdminGateScreen>
   @override
   void initState() {
     super.initState();
+    // Disable wakelock when entering admin screens.
+    WakelockPlus.disable();
     _shakeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),

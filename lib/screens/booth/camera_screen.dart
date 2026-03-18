@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../providers/app_state.dart';
 import '../../services/camera_service.dart';
 import '../../widgets/overlay_painter.dart';
@@ -23,6 +24,7 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
     _initCamera();
   }
 
@@ -39,6 +41,7 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void dispose() {
     _cameraService.disposeCamera();
+    WakelockPlus.disable();
     super.dispose();
   }
 
