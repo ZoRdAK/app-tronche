@@ -250,7 +250,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                             const Icon(Icons.lock,
                                 color: AppColors.textDarkSecondary, size: 14)
                           else
-                            const SizedBox(height: 14),
+                            _OverlayPreview(template: option),
                           const SizedBox(height: 4),
                           Text(
                             option[0].toUpperCase() + option.substring(1),
@@ -391,6 +391,64 @@ class _ConfigScreenState extends State<ConfigScreen> {
         ),
       ),
     );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _OverlayPreview extends StatelessWidget {
+  final String template;
+  const _OverlayPreview({required this.template});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (template) {
+      case 'elegant':
+        return Container(
+          height: 28,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.navy, width: 0.8),
+          ),
+          child: const Text(
+            'M & T',
+            style: TextStyle(
+              color: AppColors.navy,
+              fontSize: 10,
+              fontStyle: FontStyle.italic,
+              letterSpacing: 1,
+            ),
+          ),
+        );
+      case 'minimal':
+        return const SizedBox(
+          height: 28,
+          child: Center(
+            child: Text(
+              'm ♡ t',
+              style: TextStyle(
+                color: AppColors.textDark,
+                fontSize: 11,
+              ),
+            ),
+          ),
+        );
+      case 'festive':
+        return Container(
+          height: 28,
+          alignment: Alignment.center,
+          child: const Text(
+            '✦ M + T ✦',
+            style: TextStyle(
+              color: AppColors.primaryPink,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        );
+      default:
+        return const SizedBox(height: 28);
+    }
   }
 }
 

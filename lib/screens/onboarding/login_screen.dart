@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
@@ -120,6 +121,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       await context.read<AppState>().setEventConfig(config);
 
+      // Signal to password managers that credentials were successfully used.
+      TextInput.finishAutofillContext();
+
       if (!mounted) return;
 
       if (firstEvent != null &&
@@ -158,14 +162,14 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.cardLight,
         title: const Text('Code administrateur',
             style: TextStyle(color: AppColors.textDark)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'Saisissez votre code PIN pour accéder à l\'administration sur cet appareil.',
+              'Saisissez votre code PIN (4-6 chiffres) pour accéder à l\'espace admin sur cet appareil.',
               style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 14),
             ),
             const SizedBox(height: 16),

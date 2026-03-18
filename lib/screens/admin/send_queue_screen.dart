@@ -34,6 +34,11 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
     final syncService = context.read<SyncService>();
     final items = syncState.queueItems;
 
+    final pending =
+        items.where((i) => i.status == 'pending' || i.status == 'sending').toList();
+    final sent = items.where((i) => i.status == 'sent').toList();
+    final failed = items.where((i) => i.status == 'failed').toList();
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
@@ -98,21 +103,53 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
                 ? const Center(
                     child: Text(
                       'La file est vide',
-                      style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 16),
+                      style: TextStyle(
+                          color: AppColors.textDarkSecondary, fontSize: 16),
                     ),
                   )
                 : RefreshIndicator(
                     onRefresh: _refresh,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(8),
-                      itemCount: items.length,
-                      itemBuilder: (context, index) {
-                        final item = items[index];
-                        final photo = photoState.photos
-                            .where((p) => p.id == item.photoId)
-                            .firstOrNull;
-                        return _QueueItemTile(item: item, thumbnailPath: photo?.thumbnailPath);
-                      },
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      children: [
+                        if (pending.isNotEmpty) ...[
+                          _SectionHeader(
+                            label: 'En attente',
+                            count: pending.length,
+                            dotColor: Colors.amber,
+                          ),
+                          ...pending.map((item) => _SimpleItemTile(
+                                item: item,
+                                thumbnail: _thumbnailFor(item, photoState),
+                              )),
+                          const SizedBox(height: 12),
+                        ],
+                        if (failed.isNotEmpty) ...[
+                          _SectionHeader(
+                            label: 'Échoué',
+                            count: failed.length,
+                            dotColor: Colors.red,
+                          ),
+                          ...failed.map((item) => _SimpleItemTile(
+                                item: item,
+                                thumbnail: _thumbnailFor(item, photoState),
+                              )),
+                          const SizedBox(height: 12),
+                        ],
+                        if (sent.isNotEmpty) ...[
+                          _SectionHeader(
+                            label: 'Envoyé',
+                            count: sent.length,
+                            dotColor: Colors.green,
+                          ),
+                          ...sent.map((item) => _SimpleItemTile(
+                                item: item,
+                                thumbnail: _thumbnailFor(item, photoState),
+                              )),
+                          const SizedBox(height: 12),
+                        ],
+                      ],
                     ),
                   ),
           ),
@@ -125,7 +162,8 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
               height: 50,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  gradient: syncState.isOnline ? AppColors.primaryGradient : null,
+                  gradient:
+                      syncState.isOnline ? AppColors.primaryGradient : null,
                   color: syncState.isOnline ? null : AppColors.inputBorderLight,
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -153,117 +191,163 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
       ),
     );
   }
+
+  String? _thumbnailFor(SendQueueItem item, PhotoState photoState) {
+    return photoState.photos
+        .where((p) => p.id == item.photoId)
+        .firstOrNull
+        ?.thumbnailPath;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _QueueItemTile extends StatelessWidget {
-  final SendQueueItem item;
-  final String? thumbnailPath;
+class _SectionHeader extends StatelessWidget {
+  final String label;
+  final int count;
+  final Color dotColor;
 
-  const _QueueItemTile({required this.item, this.thumbnailPath});
+  const _SectionHeader({
+    required this.label,
+    required this.count,
+    required this.dotColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    Widget? thumbnail;
-    if (thumbnailPath != null) {
-      thumbnail = ClipRRect(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6, top: 2, left: 4),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: dotColor,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '$label ($count)',
+            style: const TextStyle(
+              color: AppColors.textDarkSecondary,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SimpleItemTile extends StatelessWidget {
+  final SendQueueItem item;
+  final String? thumbnail;
+
+  const _SimpleItemTile({required this.item, this.thumbnail});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget thumbWidget;
+    if (thumbnail != null) {
+      thumbWidget = ClipRRect(
         borderRadius: BorderRadius.circular(6),
         child: Image.file(
-          File(thumbnailPath!),
-          width: 48,
-          height: 48,
+          File(thumbnail!),
+          width: 44,
+          height: 44,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _placeholder(),
+          errorBuilder: (_, __, ___) => _placeholderThumb(),
         ),
       );
     } else {
-      thumbnail = _placeholder();
+      thumbWidget = _placeholderThumb();
     }
 
-    final statusIcon = _statusIcon(item.status);
-    final destination = item.type == 'email'
-        ? (item.recipient ?? 'email')
-        : 'Serveur';
-
-    final ts = item.sentAt ?? item.createdAt;
-    final timeStr =
-        '${ts.hour.toString().padLeft(2, '0')}:${ts.minute.toString().padLeft(2, '0')}';
+    final statusText = _statusText();
+    final dotColor = _dotColor();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.cardLight,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.inputBorderLight),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
       ),
       child: Row(
         children: [
-          thumbnail,
+          thumbWidget,
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  destination,
-                  style: const TextStyle(color: AppColors.textDark, fontSize: 14),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  item.type == 'email' ? 'Email' : 'Synchronisation',
-                  style: const TextStyle(color: AppColors.textDarkSecondary, fontSize: 12),
-                ),
-              ],
+            child: Text(
+              statusText,
+              style: const TextStyle(
+                  color: AppColors.textDark, fontSize: 13),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              statusIcon,
-              const SizedBox(height: 4),
-              Text(
-                timeStr,
-                style: const TextStyle(color: AppColors.textDarkSecondary, fontSize: 11),
-              ),
-            ],
+          const SizedBox(width: 8),
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: dotColor,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _placeholder() {
+  String _statusText() {
+    if (item.type == 'email') {
+      final dest = item.recipient ?? 'email';
+      switch (item.status) {
+        case 'sent':
+          return 'Email envoyé à $dest ✓';
+        case 'failed':
+          return 'Échec d\'envoi à $dest';
+        default:
+          return 'En attente d\'envoi à $dest';
+      }
+    } else {
+      switch (item.status) {
+        case 'sent':
+          return 'Photo synchronisée ✓';
+        case 'failed':
+          return 'Échec de synchronisation';
+        default:
+          return 'En attente de réseau…';
+      }
+    }
+  }
+
+  Color _dotColor() {
+    switch (item.status) {
+      case 'sent':
+        return Colors.green;
+      case 'failed':
+        return Colors.red;
+      default:
+        return Colors.amber;
+    }
+  }
+
+  Widget _placeholderThumb() {
     return Container(
-      width: 48,
-      height: 48,
+      width: 44,
+      height: 44,
       decoration: BoxDecoration(
         color: AppColors.inputBorderLight,
         borderRadius: BorderRadius.circular(6),
       ),
-      child: const Icon(Icons.photo, color: AppColors.textDarkSecondary, size: 24),
+      child: const Icon(Icons.photo,
+          color: AppColors.textDarkSecondary, size: 22),
     );
-  }
-
-  Widget _statusIcon(String status) {
-    switch (status) {
-      case 'sent':
-        return const Icon(Icons.check_circle, color: Colors.green, size: 20);
-      case 'failed':
-        return const Icon(Icons.error_outline, color: Colors.red, size: 20);
-      default:
-        return const Icon(Icons.pending_outlined,
-            color: Colors.amber, size: 20);
-    }
   }
 }

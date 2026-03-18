@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../config.dart';
 import '../../providers/app_state.dart';
+import '../../providers/photo_state.dart';
 
 class OnlineGalleryScreen extends StatelessWidget {
   const OnlineGalleryScreen({super.key});
@@ -13,7 +15,11 @@ class OnlineGalleryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final config = context.watch<AppState>().eventConfig;
     final shareCode = config?.shareCode ?? '';
-    final galleryUrl = 'https://tronche.zordak.fr/g/$shareCode';
+    final galleryUrl = '${AppConfig.apiBaseUrl}/g/$shareCode';
+    final recentPhotos = context.watch<PhotoState>().photos
+        .where((p) => p.isSynced && p.thumbnailPath != null)
+        .take(6)
+        .toList();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -192,6 +198,68 @@ class OnlineGalleryScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                if (recentPhotos.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Aperçu des photos synchronisées',
+                    style: TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: recentPhotos.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 6,
+                      mainAxisSpacing: 6,
+                    ),
+                    itemBuilder: (context, index) {
+                      final path = recentPhotos[index].thumbnailPath!;
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          File(path),
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: AppColors.inputBorderLight,
+                            child: const Icon(Icons.photo,
+                                color: AppColors.textDarkSecondary),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      final uri = Uri.parse(galleryUrl);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri,
+                            mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    icon: const Icon(Icons.photo_library_outlined,
+                        color: AppColors.primaryPink),
+                    label: const Text(
+                      'Voir la galerie',
+                      style: TextStyle(color: AppColors.primaryPink),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.primaryPink),
+                      minimumSize: const Size.fromHeight(50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
     );

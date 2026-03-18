@@ -68,12 +68,20 @@ class AccountScreen extends StatelessWidget {
           _ActionTile(
             icon: Icons.email_outlined,
             label: "Modifier l'email",
-            onTap: () => _showChangeEmailDialog(context),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => _ChangeEmailScreen(currentEmail: email),
+              ),
+            ),
           ),
           _ActionTile(
             icon: Icons.lock_outline,
             label: 'Modifier le mot de passe',
-            onTap: () => _showChangePasswordDialog(context),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const _ChangePasswordScreen(),
+              ),
+            ),
           ),
 
           const SizedBox(height: 16),
@@ -101,142 +109,13 @@ class AccountScreen extends StatelessWidget {
             onTap: () => _showDeleteAccountDialog(context),
           ),
 
+          const SizedBox(height: 32),
+          const Text(
+            'Tronche! v1.0.0',
+            style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 13),
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-
-  // ── Change email ────────────────────────────────────────────────────────────
-
-  void _showChangeEmailDialog(BuildContext context) {
-    final emailCtrl = TextEditingController();
-    final passwordCtrl = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.backgroundLight,
-        title: const Text("Modifier l'email",
-            style: TextStyle(color: AppColors.textDark)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _DialogField(controller: emailCtrl, label: 'Nouvel email'),
-            const SizedBox(height: 12),
-            _DialogField(
-                controller: passwordCtrl,
-                label: 'Mot de passe actuel',
-                obscure: true),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Annuler',
-                style: TextStyle(color: AppColors.textDarkSecondary)),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              try {
-                final db = DatabaseService();
-                final api = ApiService(db);
-                await api.changeEmail(
-                    emailCtrl.text.trim(), passwordCtrl.text);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Email modifié'),
-                        backgroundColor: Colors.green),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erreur : $e')),
-                  );
-                }
-              }
-            },
-            child: const Text('Enregistrer',
-                style: TextStyle(color: AppColors.primaryPink)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Change password ─────────────────────────────────────────────────────────
-
-  void _showChangePasswordDialog(BuildContext context) {
-    final currentCtrl = TextEditingController();
-    final newCtrl = TextEditingController();
-    final confirmCtrl = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.backgroundLight,
-        title: const Text('Modifier le mot de passe',
-            style: TextStyle(color: AppColors.textDark)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _DialogField(
-                controller: currentCtrl,
-                label: 'Mot de passe actuel',
-                obscure: true),
-            const SizedBox(height: 12),
-            _DialogField(
-                controller: newCtrl,
-                label: 'Nouveau mot de passe',
-                obscure: true),
-            const SizedBox(height: 12),
-            _DialogField(
-                controller: confirmCtrl,
-                label: 'Confirmer',
-                obscure: true),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Annuler',
-                style: TextStyle(color: AppColors.textDarkSecondary)),
-          ),
-          TextButton(
-            onPressed: () async {
-              if (newCtrl.text != confirmCtrl.text) {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(
-                      content: Text('Les mots de passe ne correspondent pas')),
-                );
-                return;
-              }
-              Navigator.of(ctx).pop();
-              try {
-                final db = DatabaseService();
-                final api = ApiService(db);
-                await api.changePassword(currentCtrl.text, newCtrl.text);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Mot de passe modifié'),
-                        backgroundColor: Colors.green),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erreur : $e')),
-                  );
-                }
-              }
-            },
-            child: const Text('Enregistrer',
-                style: TextStyle(color: AppColors.primaryPink)),
-          ),
         ],
       ),
     );
@@ -384,6 +263,303 @@ class AccountScreen extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Change Email Screen
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ChangeEmailScreen extends StatefulWidget {
+  final String currentEmail;
+  const _ChangeEmailScreen({required this.currentEmail});
+
+  @override
+  State<_ChangeEmailScreen> createState() => _ChangeEmailScreenState();
+}
+
+class _ChangeEmailScreenState extends State<_ChangeEmailScreen> {
+  final _newEmailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _newEmailCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final newEmail = _newEmailCtrl.text.trim();
+    if (newEmail.isEmpty || !newEmail.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Saisissez un email valide')),
+      );
+      return;
+    }
+    if (_passwordCtrl.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Saisissez votre mot de passe')),
+      );
+      return;
+    }
+    setState(() => _isSaving = true);
+    try {
+      final db = DatabaseService();
+      final api = ApiService(db);
+      await api.changeEmail(newEmail, _passwordCtrl.text);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Email modifié'),
+              backgroundColor: Colors.green),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur : $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      appBar: AppBar(
+        backgroundColor: AppColors.backgroundLight,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          "Modifier l'email",
+          style: TextStyle(
+              color: AppColors.textDark, fontWeight: FontWeight.w600),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          // Current email (read-only)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: AppColors.inputBorderLight,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              widget.currentEmail,
+              style: const TextStyle(
+                  color: AppColors.textDarkSecondary, fontSize: 15),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          _FullPageField(
+            controller: _newEmailCtrl,
+            label: 'Nouvel email',
+            keyboardType: TextInputType.emailAddress,
+          ),
+          const SizedBox(height: 16),
+          _FullPageField(
+            controller: _passwordCtrl,
+            label: 'Mot de passe actuel',
+            obscure: true,
+          ),
+          const SizedBox(height: 32),
+
+          SizedBox(
+            height: 52,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ElevatedButton(
+                onPressed: _isSaving ? null : _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Text(
+                        'Enregistrer',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600),
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Change Password Screen
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ChangePasswordScreen extends StatefulWidget {
+  const _ChangePasswordScreen();
+
+  @override
+  State<_ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+}
+
+class _ChangePasswordScreenState extends State<_ChangePasswordScreen> {
+  final _currentCtrl = TextEditingController();
+  final _newCtrl = TextEditingController();
+  final _confirmCtrl = TextEditingController();
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _currentCtrl.dispose();
+    _newCtrl.dispose();
+    _confirmCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (_currentCtrl.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Saisissez votre mot de passe actuel')),
+      );
+      return;
+    }
+    if (_newCtrl.text.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Le nouveau mot de passe doit faire au moins 6 caractères')),
+      );
+      return;
+    }
+    if (_newCtrl.text != _confirmCtrl.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Les mots de passe ne correspondent pas')),
+      );
+      return;
+    }
+    setState(() => _isSaving = true);
+    try {
+      final db = DatabaseService();
+      final api = ApiService(db);
+      await api.changePassword(_currentCtrl.text, _newCtrl.text);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Mot de passe modifié'),
+              backgroundColor: Colors.green),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur : $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      appBar: AppBar(
+        backgroundColor: AppColors.backgroundLight,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          'Modifier le mot de passe',
+          style: TextStyle(
+              color: AppColors.textDark, fontWeight: FontWeight.w600),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          _FullPageField(
+            controller: _currentCtrl,
+            label: 'Mot de passe actuel',
+            obscure: true,
+          ),
+          const SizedBox(height: 16),
+          _FullPageField(
+            controller: _newCtrl,
+            label: 'Nouveau mot de passe',
+            obscure: true,
+          ),
+          const SizedBox(height: 16),
+          _FullPageField(
+            controller: _confirmCtrl,
+            label: 'Confirmer le nouveau mot de passe',
+            obscure: true,
+          ),
+          const SizedBox(height: 32),
+
+          SizedBox(
+            height: 52,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ElevatedButton(
+                onPressed: _isSaving ? null : _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Text(
+                        'Enregistrer',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600),
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _SectionLabel extends StatelessWidget {
   final String text;
@@ -445,6 +621,49 @@ class _ActionTile extends StatelessWidget {
   }
 }
 
+class _FullPageField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final bool obscure;
+  final TextInputType? keyboardType;
+
+  const _FullPageField({
+    required this.controller,
+    required this.label,
+    this.obscure = false,
+    this.keyboardType,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      obscureText: obscure,
+      keyboardType: keyboardType,
+      style: const TextStyle(color: AppColors.textDark),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: AppColors.textDarkSecondary),
+        filled: true,
+        fillColor: AppColors.cardLight,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.inputBorderLight),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.inputBorderLight),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide:
+              const BorderSide(color: AppColors.primaryPink, width: 1.5),
+        ),
+      ),
+    );
+  }
+}
+
 class _DialogField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -477,7 +696,8 @@ class _DialogField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.primaryPink, width: 1.5),
+          borderSide:
+              const BorderSide(color: AppColors.primaryPink, width: 1.5),
         ),
       ),
     );
