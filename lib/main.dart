@@ -7,6 +7,7 @@ import 'providers/photo_state.dart';
 import 'providers/sync_state.dart';
 import 'screens/onboarding/welcome_screen.dart';
 import 'screens/booth/idle_screen.dart';
+import 'screens/admin/admin_gate_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +46,30 @@ class TroncheApp extends StatelessWidget {
           ),
         ),
         home: const AppRoot(),
+        routes: {
+          '/admin': (_) => const AdminGateScreen(),
+          '/gallery': (_) => const Scaffold(
+                backgroundColor: Color(0xFF111111),
+                body: Center(
+                  child: Text('Galerie (Task 9)',
+                      style: TextStyle(color: Colors.white54)),
+                ),
+              ),
+          '/dashboard': (_) => const Scaffold(
+                backgroundColor: Color(0xFF111111),
+                body: Center(
+                  child: Text('Dashboard (Task 9)',
+                      style: TextStyle(color: Colors.white54)),
+                ),
+              ),
+          '/subscription': (_) => const Scaffold(
+                backgroundColor: Color(0xFF111111),
+                body: Center(
+                  child: Text('Abonnement (Task 9)',
+                      style: TextStyle(color: Colors.white54)),
+                ),
+              ),
+        },
       ),
     );
   }
