@@ -82,23 +82,22 @@ class _AppRootState extends State<AppRoot> {
   @override
   void initState() {
     super.initState();
-    // Initialise app state (loads EventConfig from SQLite) after first frame.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AppState>().init();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await context.read<AppState>().init();
+      if (!mounted) return;
       context.read<SyncState>().startMonitoring();
+      _checkSync();
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final appState = context.watch<AppState>();
+  void _checkSync() {
+    if (!mounted) return;
+    final appState = context.read<AppState>();
     final syncService = context.read<SyncService>();
     if (appState.isLoggedIn && !_syncStarted) {
       _syncStarted = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        syncService.start();
-      });
+      syncService.start();
     } else if (!appState.isLoggedIn && _syncStarted) {
       _syncStarted = false;
       syncService.stop();
@@ -107,13 +106,16 @@ class _AppRootState extends State<AppRoot> {
 
   @override
   void dispose() {
-    context.read<SyncService>().stop();
+    try { context.read<SyncService>().stop(); } catch (_) {}
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+
+    // Check sync state after build completes
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkSync());
 
     if (!appState.isInitialized) {
       return const Scaffold(
