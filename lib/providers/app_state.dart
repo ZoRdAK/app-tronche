@@ -16,15 +16,15 @@ class AppState extends ChangeNotifier {
   /// The current plan name ('free', 'premium', 'pro').
   String get plan => _eventConfig?.plan ?? 'free';
 
-  /// Maximum photos allowed for the current plan.
+  /// Maximum photos allowed for the current plan (-1 = unlimited).
+  /// Must match backend config.plans limits.
   int get maxPhotos {
     switch (plan) {
       case 'premium':
-        return 500;
       case 'pro':
         return -1; // unlimited
       default:
-        return 100; // free
+        return 60; // free
     }
   }
 
