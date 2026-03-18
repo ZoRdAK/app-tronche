@@ -64,35 +64,24 @@ void main() {
     });
 
     testWidgets('04 - Booth Idle Screen (with photos)', (tester) async {
-      // Pre-populate database with event config and photos
+      // Pre-populate database with event config and photos (no API call needed)
       final db = DatabaseService();
-
-      // Login via API to get real tokens
-      final api = ApiService(db);
-      final loginData = await api.login('karl.cosse@gmail.com', 'karlkarl');
-      final token = loginData['accessToken'] as String;
-      final refreshToken = loginData['refreshToken'] as String;
-      final user = loginData['user'] as Map<String, dynamic>;
-
-      // Get events
-      final events = await api.getEvents();
-      final event = events.first as Map<String, dynamic>;
 
       final pinHash = sha256.convert(utf8.encode('1234')).toString();
 
       final config = EventConfig(
-        serverEventId: event['id'] as String,
+        serverEventId: 'demo-event-id',
         userEmail: 'karl.cosse@gmail.com',
-        jwtToken: token,
-        refreshToken: refreshToken,
-        name1: event['name1'] as String? ?? 'Marie',
-        name2: event['name2'] as String? ?? 'Thomas',
-        eventDate: event['event_date'] as String? ?? '2025-06-14',
-        overlayTemplate: event['overlay_template'] as String? ?? 'elegant',
-        timerDuration: event['timer_duration'] as int? ?? 3,
+        jwtToken: 'demo-token',
+        refreshToken: 'demo-refresh',
+        name1: 'Marie',
+        name2: 'Thomas',
+        eventDate: '2025-06-14',
+        overlayTemplate: 'elegant',
+        timerDuration: 3,
         adminPasswordHash: pinHash,
-        shareCode: event['share_code'] as String? ?? '',
-        plan: user['plan'] as String? ?? 'free',
+        shareCode: 'DEMO_SHARE_CODE',
+        plan: 'premium',
       );
       await db.saveEventConfig(config);
 
