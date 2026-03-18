@@ -5,6 +5,7 @@ import '../../config.dart';
 import '../../models/send_queue_item.dart';
 import '../../providers/photo_state.dart';
 import '../../providers/sync_state.dart';
+import '../../services/database_service.dart';
 import '../../services/sync_service.dart';
 
 class SendQueueScreen extends StatefulWidget {
@@ -18,8 +19,13 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SyncState>().loadQueueItems();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Clean up orphaned queue items (photos deleted but queue entries remain)
+      final db = DatabaseService();
+      await db.cleanOrphanedQueueItems();
+      if (mounted) {
+        context.read<SyncState>().loadQueueItems();
+      }
     });
   }
 

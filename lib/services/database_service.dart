@@ -128,6 +128,8 @@ class DatabaseService {
 
   Future<void> deletePhoto(int id) async {
     final db = await database;
+    // Also delete orphaned send_queue items for this photo
+    await db.delete('send_queue', where: 'photo_id = ?', whereArgs: [id]);
     await db.delete('photos', where: 'id = ?', whereArgs: [id]);
   }
 
@@ -188,6 +190,14 @@ class DatabaseService {
     if (error != null) updates['last_error'] = error;
     if (sentAt != null) updates['sent_at'] = sentAt.toIso8601String();
     await db.update('send_queue', updates, where: 'id = ?', whereArgs: [id]);
+  }
+
+  /// Removes send_queue items that reference deleted photos.
+  Future<void> cleanOrphanedQueueItems() async {
+    final db = await database;
+    await db.rawDelete(
+      'DELETE FROM send_queue WHERE photo_id NOT IN (SELECT id FROM photos)',
+    );
   }
 
   Future<int> getPendingQueueCount() async {
