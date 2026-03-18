@@ -263,6 +263,49 @@ class _CameraScreenState extends State<CameraScreen> {
           if (config != null)
             CustomPaint(painter: OverlayPainter(config: config)),
 
+          // Top overlay: couple names + date
+          if (config != null)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.only(top: 56, bottom: 20),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xCC000000), Colors.transparent],
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      '${config.name1} & ${config.name2}',
+                      style: const TextStyle(
+                        fontFamily: 'Georgia',
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        shadows: [Shadow(blurRadius: 12, color: Colors.black54)],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      config.eventDate.replaceAll('-', '.'),
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 14,
+                        letterSpacing: 2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           // Back button (hidden during countdown / capture)
           if (!busy)
             Positioned(
