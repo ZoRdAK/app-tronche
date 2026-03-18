@@ -59,7 +59,7 @@ class ApiService {
       data: {'refreshToken': config.refreshToken},
       options: Options(headers: {'Authorization': null}),
     );
-    final token = response.data['token'] as String?;
+    final token = response.data['accessToken'] as String?;
     final refreshToken = response.data['refreshToken'] as String?;
     if (token != null) {
       await _db.updateEventConfig({
