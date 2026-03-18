@@ -5,6 +5,7 @@ import '../../providers/app_state.dart';
 import '../../services/camera_service.dart';
 import '../../widgets/overlay_painter.dart';
 import '../../widgets/shutter_button.dart';
+import '../admin/gallery_screen.dart';
 import 'countdown_screen.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -132,7 +133,9 @@ class _CameraScreenState extends State<CameraScreen> {
                 IconButton(
                   icon: const Icon(Icons.grid_on,
                       color: Colors.white70, size: 32),
-                  onPressed: () => Navigator.of(context).pushNamed('/gallery'),
+                  onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const GalleryScreen()),
+                ),
                 ),
               ],
             ),

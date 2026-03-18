@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import '../../providers/app_state.dart';
+import 'dashboard_screen.dart';
 
 /// Admin gate: numeric PIN entry (4-6 digits) that verifies against the
 /// stored admin password hash in EventConfig.
@@ -57,7 +58,9 @@ class _AdminGateScreenState extends State<AdminGateScreen>
 
     final inputHash = sha256.convert(utf8.encode(_input)).toString();
     if (inputHash == config.adminPasswordHash) {
-      Navigator.of(context).pushReplacementNamed('/dashboard');
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const DashboardScreen()),
+      );
     } else if (_input.length >= 6) {
       _failedAttempt();
     }
