@@ -35,6 +35,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
   bool _showUpgradePrompt = false;
   late String _displayPhotoPath;
 
+  bool get _isGif =>
+      _displayPhotoPath.toLowerCase().endsWith('.gif');
+
   @override
   void initState() {
     super.initState();
@@ -71,31 +74,42 @@ class _PreviewScreenState extends State<PreviewScreen> {
       return;
     }
 
-    // Composite overlay asynchronously (Bug 3 fix)
-    final overlayService = OverlayService();
-    final addWatermark = config.plan == 'free';
+    // GIFs skip overlay compositing (too complex for animated images in MVP)
+    final isGif = (widget.rawPhotoPath ?? widget.compositedPhotoPath)
+        .toLowerCase()
+        .endsWith('.gif');
+
     String compositedPath;
-    try {
-      compositedPath = await overlayService.compositePhoto(
-        widget.rawPhotoPath ?? widget.compositedPhotoPath,
-        config,
-        addWatermark,
-      );
-    } catch (_) {
-      compositedPath = widget.rawPhotoPath ?? widget.compositedPhotoPath;
-    }
-
-    // Update display with composited photo
-    if (mounted) {
-      setState(() => _displayPhotoPath = compositedPath);
-    }
-
-    // Generate thumbnail
     String? thumbnailPath;
-    try {
-      thumbnailPath = await overlayService.generateThumbnail(compositedPath);
-    } catch (_) {
+
+    if (isGif) {
+      compositedPath = widget.rawPhotoPath ?? widget.compositedPhotoPath;
       thumbnailPath = null;
+    } else {
+      // Composite overlay asynchronously (Bug 3 fix)
+      final overlayService = OverlayService();
+      final addWatermark = config.plan == 'free';
+      try {
+        compositedPath = await overlayService.compositePhoto(
+          widget.rawPhotoPath ?? widget.compositedPhotoPath,
+          config,
+          addWatermark,
+        );
+      } catch (_) {
+        compositedPath = widget.rawPhotoPath ?? widget.compositedPhotoPath;
+      }
+
+      // Update display with composited photo
+      if (mounted) {
+        setState(() => _displayPhotoPath = compositedPath);
+      }
+
+      // Generate thumbnail
+      try {
+        thumbnailPath = await overlayService.generateThumbnail(compositedPath);
+      } catch (_) {
+        thumbnailPath = null;
+      }
     }
 
     final photo = Photo(
@@ -133,11 +147,35 @@ class _PreviewScreenState extends State<PreviewScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Photo
+          // Photo / GIF — Image.file handles animated GIFs natively in Flutter
           Image.file(
             File(_displayPhotoPath),
             fit: BoxFit.contain,
           ),
+
+          // GIF badge
+          if (_isGif)
+            Positioned(
+              top: 48,
+              right: 16,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'GIF',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
 
           // Top back button
           Positioned(
