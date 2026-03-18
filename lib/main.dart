@@ -96,7 +96,9 @@ class _AppRootState extends State<AppRoot> {
     final syncService = context.read<SyncService>();
     if (appState.isLoggedIn && !_syncStarted) {
       _syncStarted = true;
-      syncService.start();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        syncService.start();
+      });
     } else if (!appState.isLoggedIn && _syncStarted) {
       _syncStarted = false;
       syncService.stop();
