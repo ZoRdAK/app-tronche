@@ -177,6 +177,43 @@ class ApiService {
 
   // Photos
 
+  /// Fetches the list of photos for an event from the server.
+  Future<List<dynamic>> getEventPhotos(String eventId) async {
+    try {
+      final response = await _dio.get('/api/events/$eventId/photos');
+      return List<dynamic>.from(response.data);
+    } on DioException catch (e) {
+      throw _formatError(e, 'Failed to fetch photos');
+    }
+  }
+
+  /// Downloads a photo file from the server and saves it locally.
+  /// Returns the local file path.
+  Future<String> downloadPhoto(String photoCode, String savePath) async {
+    try {
+      await _dio.download(
+        '/api/gallery/photo/$photoCode/full',
+        savePath,
+      );
+      return savePath;
+    } on DioException catch (e) {
+      throw _formatError(e, 'Failed to download photo');
+    }
+  }
+
+  /// Downloads a thumbnail from the server and saves it locally.
+  Future<String> downloadThumbnail(String photoCode, String savePath) async {
+    try {
+      await _dio.download(
+        '/api/gallery/photo/$photoCode/thumb',
+        savePath,
+      );
+      return savePath;
+    } on DioException catch (e) {
+      throw _formatError(e, 'Failed to download thumbnail');
+    }
+  }
+
   Future<Map<String, dynamic>> uploadPhoto({
     required String eventId,
     required String filePath,

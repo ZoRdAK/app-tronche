@@ -10,6 +10,7 @@ import '../../services/database_service.dart';
 import '../../models/event_config.dart';
 import '../booth/idle_screen.dart';
 import 'event_setup_screen.dart';
+import 'server_sync_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -138,10 +139,20 @@ class _LoginScreenState extends State<LoginScreen> {
           await context.read<AppState>().setEventConfig(updatedConfig);
         }
         if (!mounted) return;
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const IdleScreen()),
-          (route) => false,
-        );
+        // Navigate to ServerSyncScreen to download existing photos, or IdleScreen if no server event id
+        if (config.serverEventId != null && config.serverEventId!.isNotEmpty) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => ServerSyncScreen(eventId: config.serverEventId!),
+            ),
+            (route) => false,
+          );
+        } else {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const IdleScreen()),
+            (route) => false,
+          );
+        }
       } else {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const EventSetupScreen()),
