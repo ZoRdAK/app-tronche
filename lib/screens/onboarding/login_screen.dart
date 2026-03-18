@@ -258,7 +258,8 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-          child: Form(
+          child: AutofillGroup(
+            child: Form(
             key: _formKey,
             onChanged: () => setState(() {}),
             child: Column(
@@ -284,6 +285,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
+                  autofillHints: const [AutofillHints.email, AutofillHints.username],
+                  textInputAction: TextInputAction.next,
                   style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('votre@email.com'),
                   validator: (v) {
@@ -297,6 +300,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _passwordCtrl,
                   obscureText: _obscurePassword,
+                  autofillHints: const [AutofillHints.password],
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _isFormValid ? _submit() : null,
                   style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('Votre mot de passe').copyWith(
                     suffixIcon: IconButton(
@@ -409,6 +415,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 32),
               ],
             ),
+          ),
           ),
         ),
       ),

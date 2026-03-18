@@ -106,7 +106,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-          child: Form(
+          child: AutofillGroup(
+            child: Form(
             key: _formKey,
             onChanged: () => setState(() {}),
             child: Column(
@@ -132,6 +133,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
+                  autofillHints: const [AutofillHints.email, AutofillHints.newUsername],
+                  textInputAction: TextInputAction.next,
                   style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('votre@email.com'),
                   validator: (v) {
@@ -146,6 +149,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _passwordCtrl,
                   obscureText: _obscurePassword,
+                  autofillHints: const [AutofillHints.newPassword],
+                  textInputAction: TextInputAction.next,
                   style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('8 caractères minimum').copyWith(
                     suffixIcon: IconButton(
@@ -332,6 +337,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 32),
               ],
             ),
+          ),
           ),
         ),
       ),

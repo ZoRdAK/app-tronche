@@ -1,44 +1,67 @@
 default_platform(:ios)
 
+# App Store Connect API Key (same key as familia project)
+def asc_key
+  app_store_connect_api_key(
+    key_id:       ENV["ASC_KEY_ID"],
+    issuer_id:    ENV["ASC_ISSUER_ID"],
+    key_filepath: ENV["ASC_KEY_FILEPATH"] || File.expand_path("~/.appstoreconnect/private_keys/AuthKey_#{ENV['ASC_KEY_ID']}.p8"),
+  )
+end
+
 platform :ios do
-  desc "Build and upload to App Store Connect (TestFlight)"
+  desc "Build and upload to TestFlight"
   lane :beta do
-    # Build Flutter app first
     Dir.chdir("..") do
-      sh("fvm flutter build ios --release --no-codesign")
+      sh("fvm flutter build ipa --release --export-options-plist=ios/ExportOptions.plist")
     end
 
-    build_app(
-      workspace: "Runner.xcworkspace",
-      scheme: "Runner",
-      export_method: "app-store",
-      output_directory: "../build/ios",
-      output_name: "Tronche.ipa",
-    )
-
     upload_to_testflight(
+      api_key:                          asc_key,
+      ipa:                              "../build/ios/ipa/tronche.ipa",
       skip_waiting_for_build_processing: true,
     )
   end
 
-  desc "Build and upload to App Store for release"
+  desc "Sync metadata to App Store Connect (no binary)"
+  lane :metadata do
+    deliver(
+      api_key:            asc_key,
+      submit_for_review:  false,
+      automatic_release:  false,
+      force:              true,
+      skip_binary_upload: true,
+      skip_screenshots:   true,
+      metadata_path:      "./fastlane/metadata",
+    )
+  end
+
+  desc "Build, upload and submit for App Store review"
   lane :release do
     Dir.chdir("..") do
-      sh("fvm flutter build ios --release --no-codesign")
+      sh("fvm flutter build ipa --release --export-options-plist=ios/ExportOptions.plist")
     end
 
-    build_app(
-      workspace: "Runner.xcworkspace",
-      scheme: "Runner",
-      export_method: "app-store",
-      output_directory: "../build/ios",
-      output_name: "Tronche.ipa",
-    )
-
-    upload_to_app_store(
-      skip_metadata: false,
-      skip_screenshots: true,
-      force: true,
+    deliver(
+      api_key:            asc_key,
+      submit_for_review:  true,
+      automatic_release:  false,
+      force:              true,
+      skip_screenshots:   true,
+      metadata_path:      "./fastlane/metadata",
+      ipa:                "../build/ios/ipa/tronche.ipa",
+      submission_information: {
+        add_id_info_uses_idfa:             false,
+        export_compliance_uses_encryption: false,
+      },
+      precheck_include_in_app_purchases: false,
+      app_review_information: {
+        first_name:    "Karl",
+        last_name:     "Cosse",
+        phone_number:  "+33633598852",
+        email_address: "karl.cosse@gmail.com",
+        review_notes:  "Application photobooth pour mariages. Créez un compte, configurez un événement, puis prenez des photos. L'app nécessite une caméra.",
+      },
     )
   end
 end
