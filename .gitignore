@@ -47,3 +47,6 @@ app.*.map.json
 # Fastlane secrets
 .env.fastlane
 android/fastlane/play-store-key.json
+
+# Screenshot test assets (not for prod)
+assets/screenshots/
