@@ -25,18 +25,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.backgroundLight,
         title: const Text('Supprimer la photo',
-            style: TextStyle(color: Colors.white)),
+            style: TextStyle(color: AppColors.textDark)),
         content: const Text(
           'Cette photo sera supprimée définitivement.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppColors.textDarkSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Annuler',
-                style: TextStyle(color: Colors.white54)),
+                style: TextStyle(color: AppColors.textDarkSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -58,18 +58,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
     final photos = photoState.photos;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: AppColors.inputFill,
+        backgroundColor: AppColors.backgroundLight,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Galerie locale (${photos.length})',
           style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w600),
+              color: AppColors.textDark, fontWeight: FontWeight.w600),
         ),
       ),
       body: photos.isEmpty
@@ -78,11 +78,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.photo_library_outlined,
-                      color: Colors.white24, size: 64),
+                      color: AppColors.inputBorderLight, size: 64),
                   SizedBox(height: 16),
                   Text(
                     'Aucune photo pour le moment',
-                    style: TextStyle(color: Colors.white38, fontSize: 16),
+                    style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 16),
                   ),
                 ],
               ),
@@ -120,9 +120,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                           File(displayPath),
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
-                            color: const Color(0xFF2A2A2A),
+                            color: AppColors.inputBorderLight,
                             child: const Icon(Icons.broken_image,
-                                color: Colors.white24),
+                                color: AppColors.textDarkSecondary),
                           ),
                         ),
                         // Sync status indicator

@@ -35,18 +35,17 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
     final items = syncState.queueItems;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: AppColors.inputFill,
+        backgroundColor: AppColors.backgroundLight,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           "File d'envoi",
-          style:
-              TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
         ),
       ),
       body: Column(
@@ -54,7 +53,7 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
           // Network status bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            color: AppColors.inputFill,
+            color: AppColors.cardLight,
             child: Row(
               children: [
                 Container(
@@ -86,7 +85,7 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
                   const SizedBox(width: 6),
                   const Text(
                     'Synchronisation en cours…',
-                    style: TextStyle(color: Colors.white54, fontSize: 12),
+                    style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 12),
                   ),
                 ],
               ],
@@ -99,7 +98,7 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
                 ? const Center(
                     child: Text(
                       'La file est vide',
-                      style: TextStyle(color: Colors.white38, fontSize: 16),
+                      style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 16),
                     ),
                   )
                 : RefreshIndicator(
@@ -121,20 +120,31 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
           // Force sync button
           Padding(
             padding: const EdgeInsets.all(16),
-            child: ElevatedButton.icon(
-              onPressed: syncState.isOnline
-                  ? () => syncService.syncNow()
-                  : null,
-              icon: const Icon(Icons.sync, color: Colors.white),
-              label: const Text(
-                'Forcer la synchronisation',
-                style: TextStyle(color: Colors.white, fontSize: 15),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryPink,
-                minimumSize: const Size.fromHeight(50),
-                shape: RoundedRectangleBorder(
+            child: SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: syncState.isOnline ? AppColors.primaryGradient : null,
+                  color: syncState.isOnline ? null : AppColors.inputBorderLight,
                   borderRadius: BorderRadius.circular(12),
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: syncState.isOnline
+                      ? () => syncService.syncNow()
+                      : null,
+                  icon: const Icon(Icons.sync, color: Colors.white),
+                  label: const Text(
+                    'Forcer la synchronisation',
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -184,8 +194,16 @@ class _QueueItemTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: AppColors.cardLight,
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.inputBorderLight),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -197,15 +215,14 @@ class _QueueItemTile extends StatelessWidget {
               children: [
                 Text(
                   destination,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  style: const TextStyle(color: AppColors.textDark, fontSize: 14),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   item.type == 'email' ? 'Email' : 'Synchronisation',
-                  style:
-                      const TextStyle(color: Colors.white38, fontSize: 12),
+                  style: const TextStyle(color: AppColors.textDarkSecondary, fontSize: 12),
                 ),
               ],
             ),
@@ -217,8 +234,7 @@ class _QueueItemTile extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 timeStr,
-                style:
-                    const TextStyle(color: Colors.white38, fontSize: 11),
+                style: const TextStyle(color: AppColors.textDarkSecondary, fontSize: 11),
               ),
             ],
           ),
@@ -232,10 +248,10 @@ class _QueueItemTile extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: AppColors.inputBorderLight,
         borderRadius: BorderRadius.circular(6),
       ),
-      child: const Icon(Icons.photo, color: Colors.white24, size: 24),
+      child: const Icon(Icons.photo, color: AppColors.textDarkSecondary, size: 24),
     );
   }
 

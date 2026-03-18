@@ -19,17 +19,17 @@ class DashboardScreen extends StatelessWidget {
     final syncState = context.watch<SyncState>();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: AppColors.inputFill,
+        backgroundColor: AppColors.backgroundLight,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Administration',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
         ),
       ),
       body: ListView(
@@ -56,7 +56,7 @@ class DashboardScreen extends StatelessWidget {
                 label: 'En attente',
                 value: '${photoState.pendingCount}',
                 icon: Icons.pending_outlined,
-                color: Colors.amber,
+                color: AppColors.orange,
               ),
             ],
           ),
@@ -67,8 +67,15 @@ class DashboardScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: AppColors.cardLight,
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(15),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -84,8 +91,7 @@ class DashboardScreen extends StatelessWidget {
                 Text(
                   syncState.isOnline ? 'Connecté' : 'Hors ligne',
                   style: TextStyle(
-                    color:
-                        syncState.isOnline ? Colors.green : Colors.red,
+                    color: syncState.isOnline ? Colors.green : Colors.red,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -102,7 +108,7 @@ class DashboardScreen extends StatelessWidget {
                   const SizedBox(width: 6),
                   const Text(
                     'Synchronisation…',
-                    style: TextStyle(color: Colors.white54, fontSize: 12),
+                    style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 12),
                   ),
                 ],
               ],
@@ -158,24 +164,37 @@ class DashboardScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ─── Return to photobooth ─────────────────────────────────────────
-          OutlinedButton(
-            onPressed: () {
-              // Pop back past admin gate to idle screen.
-              Navigator.of(context)
-                ..pop()  // DashboardScreen
-                ..pop(); // AdminGateScreen
-            },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primaryPink,
-              side: const BorderSide(color: AppColors.primaryPink),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(12),
               ),
-            ),
-            child: const Text(
-              'Retour au photobooth',
-              style: TextStyle(fontSize: 16),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Pop back past admin gate to idle screen.
+                  Navigator.of(context)
+                    ..pop()  // DashboardScreen
+                    ..pop(); // AdminGateScreen
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Retour au photobooth',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
           ),
 
@@ -207,8 +226,15 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
+          color: AppColors.cardLight,
           borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(15),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +253,7 @@ class _StatCard extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                color: Colors.white54,
+                color: AppColors.textDarkSecondary,
                 fontSize: 11,
               ),
               maxLines: 1,
@@ -256,14 +282,21 @@ class _MenuTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: AppColors.cardLight,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.inputBorderLight),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: ListTile(
         leading: Icon(icon, color: AppColors.primaryPink),
-        title: Text(label, style: const TextStyle(color: Colors.white)),
-        trailing:
-            const Icon(Icons.chevron_right, color: Colors.white38, size: 20),
+        title: Text(label, style: const TextStyle(color: AppColors.textDark)),
+        trailing: const Icon(Icons.chevron_right, color: AppColors.textDarkSecondary, size: 20),
         onTap: onTap,
       ),
     );

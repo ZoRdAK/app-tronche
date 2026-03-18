@@ -62,7 +62,12 @@ class _ConfigScreenState extends State<ConfigScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2035),
       builder: (context, child) => Theme(
-        data: ThemeData.dark(),
+        data: ThemeData.light().copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: AppColors.primaryPink,
+            onPrimary: Colors.white,
+          ),
+        ),
         child: child!,
       ),
     );
@@ -142,17 +147,17 @@ class _ConfigScreenState extends State<ConfigScreen> {
     final appState = context.watch<AppState>();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: AppColors.inputFill,
+        backgroundColor: AppColors.backgroundLight,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Configuration',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
         ),
       ),
       body: Form(
@@ -183,8 +188,9 @@ class _ConfigScreenState extends State<ConfigScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
+                  color: AppColors.cardLight,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.inputBorderLight),
                 ),
                 child: Row(
                   children: [
@@ -199,8 +205,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
                           : 'Choisir une date',
                       style: TextStyle(
                         color: _eventDate != null
-                            ? Colors.white
-                            : Colors.white38,
+                            ? AppColors.textDark
+                            : AppColors.textDarkSecondary,
                       ),
                     ),
                   ],
@@ -228,13 +234,13 @@ class _ConfigScreenState extends State<ConfigScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: selected
-                            ? AppColors.primaryPink.withAlpha(40)
-                            : const Color(0xFF1E1E1E),
+                            ? AppColors.primaryPink.withAlpha(20)
+                            : AppColors.cardLight,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: selected
                               ? AppColors.primaryPink
-                              : Colors.transparent,
+                              : AppColors.inputBorderLight,
                           width: 1.5,
                         ),
                       ),
@@ -242,14 +248,16 @@ class _ConfigScreenState extends State<ConfigScreen> {
                         children: [
                           if (locked)
                             const Icon(Icons.lock,
-                                color: Colors.white38, size: 14)
+                                color: AppColors.textDarkSecondary, size: 14)
                           else
                             const SizedBox(height: 14),
                           const SizedBox(height: 4),
                           Text(
                             option[0].toUpperCase() + option.substring(1),
                             style: TextStyle(
-                              color: locked ? Colors.white38 : Colors.white,
+                              color: locked
+                                  ? AppColors.textDarkSecondary
+                                  : AppColors.textDark,
                               fontSize: 12,
                             ),
                             textAlign: TextAlign.center,
@@ -275,13 +283,13 @@ class _ConfigScreenState extends State<ConfigScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
                         color: selected
-                            ? AppColors.primaryPink.withAlpha(40)
-                            : const Color(0xFF1E1E1E),
+                            ? AppColors.primaryPink.withAlpha(20)
+                            : AppColors.cardLight,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: selected
                               ? AppColors.primaryPink
-                              : Colors.transparent,
+                              : AppColors.inputBorderLight,
                           width: 1.5,
                         ),
                       ),
@@ -291,7 +299,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                         style: TextStyle(
                           color: selected
                               ? AppColors.primaryPink
-                              : Colors.white,
+                              : AppColors.textDark,
                           fontWeight: selected
                               ? FontWeight.w700
                               : FontWeight.w400,
@@ -311,17 +319,25 @@ class _ConfigScreenState extends State<ConfigScreen> {
               maxLength: 6,
               obscureText: true,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: AppColors.textDark),
               decoration: InputDecoration(
                 hintText: '4 à 6 chiffres',
-                hintStyle: const TextStyle(color: Colors.white38),
+                hintStyle: const TextStyle(color: AppColors.textDarkSecondary),
                 filled: true,
-                fillColor: const Color(0xFF1E1E1E),
+                fillColor: AppColors.cardLight,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                  borderSide: const BorderSide(color: AppColors.inputBorderLight),
                 ),
-                counterStyle: const TextStyle(color: Colors.white38),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.inputBorderLight),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.primaryPink, width: 1.5),
+                ),
+                counterStyle: const TextStyle(color: AppColors.textDarkSecondary),
               ),
               validator: (v) {
                 if (v == null || v.isEmpty) return null; // Optional
@@ -332,32 +348,42 @@ class _ConfigScreenState extends State<ConfigScreen> {
 
             const SizedBox(height: 24),
 
-            ElevatedButton(
-              onPressed: _isSaving ? null : _save,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryPink,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
                   borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-              child: _isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text(
-                      'Enregistrer',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                child: ElevatedButton(
+                  onPressed: _isSaving ? null : _save,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                  ),
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Enregistrer',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                ),
+              ),
             ),
 
             const SizedBox(height: 16),
@@ -381,7 +407,7 @@ class _SectionLabel extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          color: Colors.white70,
+          color: AppColors.textDarkSecondary,
           fontSize: 13,
           fontWeight: FontWeight.w500,
         ),
@@ -405,15 +431,23 @@ class _Field extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: AppColors.textDark),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white54),
+        labelStyle: const TextStyle(color: AppColors.textDarkSecondary),
         filled: true,
-        fillColor: const Color(0xFF1E1E1E),
+        fillColor: AppColors.cardLight,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.inputBorderLight),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.inputBorderLight),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primaryPink, width: 1.5),
         ),
       ),
       validator: validator,

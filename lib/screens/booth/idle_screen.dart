@@ -138,9 +138,15 @@ class _IdleScreenState extends State<IdleScreen> {
                       '${config.name1} & ${config.name2}',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800,
                         letterSpacing: 0.5,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black54,
+                            blurRadius: 8,
+                          ),
+                        ],
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -151,6 +157,13 @@ class _IdleScreenState extends State<IdleScreen> {
                         color: Colors.white70,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
+                        letterSpacing: 1.2,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black54,
+                            blurRadius: 6,
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -219,7 +232,7 @@ class _IdleScreenState extends State<IdleScreen> {
                     onLongPress: _goToAdmin,
                     child: Image.asset(
                       'assets/logo.png',
-                      height: 40,
+                      height: 50,
                       errorBuilder: (_, __, ___) => const Text(
                         'Tronche!',
                         style: TextStyle(

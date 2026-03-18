@@ -10,7 +10,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -18,7 +18,7 @@ class WelcomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Spacer(flex: 2),
-              // App logo with gradient fallback
+              // App logo — large and centered
               Image.asset(
                 'assets/logo.png',
                 width: 280,
@@ -41,7 +41,7 @@ class WelcomeScreen extends StatelessWidget {
                 'Le photobooth de votre mariage',
                 style: TextStyle(
                   fontSize: 18,
-                  color: AppColors.textSecondary,
+                  color: AppColors.textDarkSecondary,
                   fontWeight: FontWeight.w400,
                 ),
                 textAlign: TextAlign.center,
@@ -55,6 +55,13 @@ class WelcomeScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: AppColors.primaryGradient,
                     borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryPink.withAlpha(60),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: ElevatedButton(
                     onPressed: () {
@@ -94,7 +101,7 @@ class WelcomeScreen extends StatelessWidget {
                   "J'ai déjà un compte",
                   style: TextStyle(
                     fontSize: 16,
-                    color: AppColors.primaryPink,
+                    color: AppColors.navy,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -110,13 +117,13 @@ class WelcomeScreen extends StatelessWidget {
                       'CGU',
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textMuted,
+                        color: AppColors.textDarkSecondary,
                       ),
                     ),
                   ),
                   const Text(
                     '·',
-                    style: TextStyle(color: Color(0xFF444444)),
+                    style: TextStyle(color: AppColors.textDarkSecondary),
                   ),
                   TextButton(
                     onPressed: () =>
@@ -125,7 +132,7 @@ class WelcomeScreen extends StatelessWidget {
                       'Politique de confidentialité',
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textMuted,
+                        color: AppColors.textDarkSecondary,
                       ),
                     ),
                   ),

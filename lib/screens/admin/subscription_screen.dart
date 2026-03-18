@@ -11,17 +11,17 @@ class SubscriptionScreen extends StatelessWidget {
     final plan = context.watch<AppState>().plan;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: AppColors.inputFill,
+        backgroundColor: AppColors.backgroundLight,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Mon abonnement',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
         ),
       ),
       body: ListView(
@@ -53,7 +53,7 @@ class SubscriptionScreen extends StatelessWidget {
           const Text(
             'Ce qui est inclus',
             style: TextStyle(
-              color: Colors.white,
+              color: AppColors.textDark,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
@@ -62,7 +62,7 @@ class SubscriptionScreen extends StatelessWidget {
 
           _PlanCard(
             name: 'Gratuit',
-            color: Colors.white38,
+            color: AppColors.textDarkSecondary,
             features: const [
               'Jusqu\'à 100 photos',
               'Cadre Élégant',
@@ -108,10 +108,16 @@ class SubscriptionScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: AppColors.cardLight,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: AppColors.primaryPink.withAlpha(80)),
+              border: Border.all(color: AppColors.primaryPink.withAlpha(80)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(10),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Column(
               children: [
@@ -121,7 +127,7 @@ class SubscriptionScreen extends StatelessWidget {
                 const Text(
                   'Les achats in-app seront disponibles prochainement',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textDark,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -130,7 +136,7 @@ class SubscriptionScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 const Text(
                   'Revenez bientôt pour accéder aux offres Premium et Pro.',
-                  style: TextStyle(color: Colors.white54, fontSize: 13),
+                  style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
@@ -204,11 +210,19 @@ class _PlanCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: AppColors.cardLight,
         borderRadius: BorderRadius.circular(12),
-        border: isCurrentPlan
-            ? Border.all(color: color, width: 1.5)
-            : null,
+        border: Border.all(
+          color: isCurrentPlan ? color : AppColors.inputBorderLight,
+          width: isCurrentPlan ? 1.5 : 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,7 +243,7 @@ class _PlanCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: color.withAlpha(40),
+                    color: color.withAlpha(30),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -254,7 +268,7 @@ class _PlanCard extends StatelessWidget {
                   Text(
                     f,
                     style: const TextStyle(
-                        color: Colors.white70, fontSize: 13),
+                        color: AppColors.textDarkSecondary, fontSize: 13),
                   ),
                 ],
               ),

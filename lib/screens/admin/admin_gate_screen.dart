@@ -85,17 +85,17 @@ class _AdminGateScreenState extends State<AdminGateScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Administration',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
@@ -106,7 +106,7 @@ class _AdminGateScreenState extends State<AdminGateScreen>
             const Text(
               'Code administrateur',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textDark,
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
@@ -115,7 +115,7 @@ class _AdminGateScreenState extends State<AdminGateScreen>
             const SizedBox(height: 8),
             const Text(
               'Saisissez votre code PIN (4-6 chiffres)',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
+              style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
@@ -147,11 +147,11 @@ class _AdminGateScreenState extends State<AdminGateScreen>
                           shape: BoxShape.circle,
                           color: filled
                               ? AppColors.primaryPink
-                              : AppColors.inputBorder,
+                              : AppColors.inputBorderLight,
                           border: Border.all(
                             color: filled
                                 ? AppColors.primaryPink
-                                : const Color(0xFF444444),
+                                : AppColors.inputBorderLight,
                           ),
                         ),
                       ),
@@ -188,7 +188,7 @@ class _AdminGateScreenState extends State<AdminGateScreen>
                 child: IconButton(
                   onPressed: _onDelete,
                   icon: const Icon(Icons.backspace_outlined,
-                      color: Colors.white70, size: 24),
+                      color: AppColors.textDarkSecondary, size: 24),
                 ),
               ),
             ],
@@ -213,14 +213,14 @@ class _AdminGateScreenState extends State<AdminGateScreen>
         onPressed: () => _onKey(digit),
         style: TextButton.styleFrom(
           shape: const CircleBorder(),
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.textDark,
         ),
         child: Text(
           digit,
           style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w400,
-            color: Colors.white,
+            color: AppColors.textDark,
           ),
         ),
       ),

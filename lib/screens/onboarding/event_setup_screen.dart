@@ -54,12 +54,12 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
       lastDate: DateTime(2030),
       builder: (context, child) {
         return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primaryPink,
               onPrimary: Colors.white,
-              surface: Color(0xFF1E1E1E),
-              onSurface: Colors.white,
+              surface: AppColors.backgroundLight,
+              onSurface: AppColors.textDark,
             ),
           ),
           child: child!,
@@ -142,13 +142,17 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
           'Configuration',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
         ),
       ),
       body: SafeArea(
@@ -165,7 +169,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.textDark,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -175,7 +179,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _name1Ctrl,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('Marie'),
                   validator: (v) =>
                       (v?.trim().isEmpty ?? true) ? 'Requis' : null,
@@ -185,7 +189,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _name2Ctrl,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('Thomas'),
                   validator: (v) =>
                       (v?.trim().isEmpty ?? true) ? 'Requis' : null,
@@ -202,9 +206,9 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
                     decoration: BoxDecoration(
-                      color: AppColors.inputFill,
+                      color: AppColors.inputFillLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.inputBorder),
+                      border: Border.all(color: AppColors.inputBorderLight),
                     ),
                     child: Row(
                       children: [
@@ -219,8 +223,8 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                                   '${_eventDate!.year}',
                           style: TextStyle(
                             color: _eventDate == null
-                                ? const Color(0xFF444444)
-                                : Colors.white,
+                                ? AppColors.textDarkSecondary
+                                : AppColors.textDark,
                             fontSize: 16,
                           ),
                         ),
@@ -258,12 +262,12 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                                   : null,
                               color: isSelected
                                   ? null
-                                  : const Color(0xFF1E1E1E),
+                                  : AppColors.inputFillLight,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: isSelected
                                     ? Colors.transparent
-                                    : AppColors.inputBorder,
+                                    : AppColors.inputBorderLight,
                               ),
                             ),
                             child: Center(
@@ -272,7 +276,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                                 style: TextStyle(
                                   color: isSelected
                                       ? Colors.white
-                                      : AppColors.textSecondary,
+                                      : AppColors.textDarkSecondary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                 ),
@@ -297,7 +301,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                     LengthLimitingTextInputFormatter(6),
                   ],
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textDark,
                     letterSpacing: 8,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -313,7 +317,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                 const SizedBox(height: 10),
                 const Text(
                   'Ce code protège l\'accès admin contre les invités curieux.',
-                  style: TextStyle(color: Color(0xFF666666), fontSize: 13),
+                  style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 13),
                 ),
                 const SizedBox(height: 32),
 
@@ -321,9 +325,9 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2A1010),
+                      color: const Color(0xFFFFF0F0),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFF7A2020)),
+                      border: Border.all(color: AppColors.error.withAlpha(120)),
                     ),
                     child: Row(
                       children: [
@@ -359,7 +363,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                                 : null,
                             color: _isFormValid
                                 ? null
-                                : AppColors.inputBorder,
+                                : AppColors.inputBorderLight,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: ElevatedButton(
@@ -379,7 +383,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: _isFormValid
                                     ? Colors.white
-                                    : AppColors.textMuted,
+                                    : AppColors.textDarkSecondary,
                               ),
                             ),
                           ),
@@ -398,7 +402,7 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
     return Text(
       text,
       style: const TextStyle(
-        color: Color(0xFFCCCCCC),
+        color: AppColors.textDark,
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
@@ -408,16 +412,16 @@ class _EventSetupScreenState extends State<EventSetupScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF444444)),
+      hintStyle: const TextStyle(color: AppColors.textDarkSecondary),
       filled: true,
-      fillColor: AppColors.inputFill,
+      fillColor: AppColors.inputFillLight,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.inputBorder),
+        borderSide: const BorderSide(color: AppColors.inputBorderLight),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.inputBorder),
+        borderSide: const BorderSide(color: AppColors.inputBorderLight),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -485,13 +489,22 @@ class _OverlayTemplateSelector extends StatelessWidget {
                   gradient: isSelected
                       ? AppColors.primaryGradient
                       : null,
-                  color: isSelected ? null : const Color(0xFF1E1E1E),
+                  color: isSelected ? null : AppColors.inputFillLight,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected
                         ? Colors.transparent
-                        : AppColors.inputBorder,
+                        : AppColors.inputBorderLight,
                   ),
+                  boxShadow: isSelected
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(15),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                 ),
                 child: Stack(
                   children: [
@@ -502,10 +515,10 @@ class _OverlayTemplateSelector extends StatelessWidget {
                           Icon(
                             t.icon,
                             color: t.locked
-                                ? const Color(0xFF444444)
+                                ? AppColors.inputBorderLight
                                 : isSelected
                                     ? Colors.white
-                                    : AppColors.textSecondary,
+                                    : AppColors.textDarkSecondary,
                             size: 28,
                           ),
                           const SizedBox(height: 6),
@@ -513,10 +526,10 @@ class _OverlayTemplateSelector extends StatelessWidget {
                             t.name,
                             style: TextStyle(
                               color: t.locked
-                                  ? const Color(0xFF444444)
+                                  ? AppColors.inputBorderLight
                                   : isSelected
                                       ? Colors.white
-                                      : AppColors.textSecondary,
+                                      : AppColors.textDark,
                               fontWeight: FontWeight.w600,
                               fontSize: 13,
                             ),
@@ -525,10 +538,10 @@ class _OverlayTemplateSelector extends StatelessWidget {
                             t.description,
                             style: TextStyle(
                               color: t.locked
-                                  ? const Color(0xFF333333)
+                                  ? AppColors.inputBorderLight
                                   : isSelected
                                       ? Colors.white70
-                                      : const Color(0xFF666666),
+                                      : AppColors.textDarkSecondary,
                               fontSize: 11,
                             ),
                           ),
@@ -542,12 +555,12 @@ class _OverlayTemplateSelector extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: AppColors.inputBorder,
+                            color: AppColors.inputBorderLight,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Icon(
                             Icons.lock,
-                            color: Color(0xFF666666),
+                            color: AppColors.textDarkSecondary,
                             size: 12,
                           ),
                         ),

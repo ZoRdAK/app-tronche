@@ -94,12 +94,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -117,13 +117,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.textDark,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Configurez votre photobooth en quelques minutes.',
-                  style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 15, color: AppColors.textDarkSecondary),
                 ),
                 const SizedBox(height: 36),
                 _buildLabel('Email'),
@@ -132,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('votre@email.com'),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Email requis';
@@ -146,14 +146,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _passwordCtrl,
                   obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('8 caractères minimum').copyWith(
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: AppColors.textMuted,
+                        color: AppColors.textDarkSecondary,
                       ),
                       onPressed: () =>
                           setState(() => _obscurePassword = !_obscurePassword),
@@ -172,14 +172,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _confirmCtrl,
                   obscureText: _obscureConfirm,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('Répéter le mot de passe').copyWith(
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureConfirm
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: AppColors.textMuted,
+                        color: AppColors.textDarkSecondary,
                       ),
                       onPressed: () =>
                           setState(() => _obscureConfirm = !_obscureConfirm),
@@ -204,7 +204,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onChanged: (v) =>
                             setState(() => _cguAccepted = v ?? false),
                         activeColor: AppColors.primaryPink,
-                        side: const BorderSide(color: Color(0xFF444444)),
+                        side: const BorderSide(color: AppColors.inputBorderLight),
                       ),
                       Expanded(
                         child: Padding(
@@ -214,7 +214,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             child: RichText(
                               text: TextSpan(
                                 style: const TextStyle(
-                                  color: Color(0xFFAAAAAA),
+                                  color: AppColors.textDarkSecondary,
                                   fontSize: 14,
                                 ),
                                 children: [
@@ -266,9 +266,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2A1010),
+                      color: const Color(0xFFFFF0F0),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFF7A2020)),
+                      border: Border.all(color: AppColors.error.withAlpha(120)),
                     ),
                     child: Row(
                       children: [
@@ -303,7 +303,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 : null,
                             color: _isFormValid
                                 ? null
-                                : AppColors.inputBorder,
+                                : AppColors.inputBorderLight,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: ElevatedButton(
@@ -323,7 +323,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: _isFormValid
                                     ? Colors.white
-                                    : AppColors.textMuted,
+                                    : AppColors.textDarkSecondary,
                               ),
                             ),
                           ),
@@ -342,7 +342,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Text(
       text,
       style: const TextStyle(
-        color: Color(0xFFCCCCCC),
+        color: AppColors.textDark,
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
@@ -352,16 +352,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF444444)),
+      hintStyle: const TextStyle(color: AppColors.textDarkSecondary),
       filled: true,
-      fillColor: AppColors.inputFill,
+      fillColor: AppColors.inputFillLight,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.inputBorder),
+        borderSide: const BorderSide(color: AppColors.inputBorderLight),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.inputBorder),
+        borderSide: const BorderSide(color: AppColors.inputBorderLight),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

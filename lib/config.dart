@@ -27,6 +27,14 @@ class AppColors {
   static const Color warning = Color(0xFFF59E0B);
   static const Color error = Color(0xFFE57373);
 
+  // Light theme colors (onboarding + admin)
+  static const Color backgroundLight = Color(0xFFFDF8F4);
+  static const Color cardLight = Color(0xFFFFFFFF);
+  static const Color textDark = Color(0xFF2C3E6B);
+  static const Color textDarkSecondary = Color(0xFF555566);
+  static const Color inputFillLight = Color(0xFFFFFFFF);
+  static const Color inputBorderLight = Color(0xFFE0DDD8);
+
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [primaryPink, orange],
   );

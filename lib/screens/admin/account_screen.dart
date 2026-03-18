@@ -16,17 +16,17 @@ class AccountScreen extends StatelessWidget {
     final email = appState.eventConfig?.userEmail ?? '';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: AppColors.inputFill,
+        backgroundColor: AppColors.backgroundLight,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Mon compte',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
         ),
       ),
       body: ListView(
@@ -36,8 +36,16 @@ class AccountScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: AppColors.cardLight,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.inputBorderLight),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(10),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -47,7 +55,7 @@ class AccountScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     email,
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(color: AppColors.textDark),
                   ),
                 ),
               ],
@@ -108,9 +116,9 @@ class AccountScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.backgroundLight,
         title: const Text("Modifier l'email",
-            style: TextStyle(color: Colors.white)),
+            style: TextStyle(color: AppColors.textDark)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -126,7 +134,7 @@ class AccountScreen extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: const Text('Annuler',
-                style: TextStyle(color: Colors.white54)),
+                style: TextStyle(color: AppColors.textDarkSecondary)),
           ),
           TextButton(
             onPressed: () async {
@@ -169,9 +177,9 @@ class AccountScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.backgroundLight,
         title: const Text('Modifier le mot de passe',
-            style: TextStyle(color: Colors.white)),
+            style: TextStyle(color: AppColors.textDark)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -195,7 +203,7 @@ class AccountScreen extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: const Text('Annuler',
-                style: TextStyle(color: Colors.white54)),
+                style: TextStyle(color: AppColors.textDarkSecondary)),
           ),
           TextButton(
             onPressed: () async {
@@ -245,13 +253,13 @@ class AccountScreen extends StatelessWidget {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            backgroundColor: const Color(0xFF1E1E1E),
+            backgroundColor: AppColors.backgroundLight,
             title: const Text('Export',
-                style: TextStyle(color: Colors.white)),
+                style: TextStyle(color: AppColors.textDark)),
             content: SingleChildScrollView(
               child: Text(
                 result.toString(),
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                style: const TextStyle(color: AppColors.textDarkSecondary, fontSize: 12),
               ),
             ),
             actions: [
@@ -279,18 +287,18 @@ class AccountScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.backgroundLight,
         title: const Text('Déconnexion',
-            style: TextStyle(color: Colors.white)),
+            style: TextStyle(color: AppColors.textDark)),
         content: const Text(
           'Voulez-vous vraiment vous déconnecter ?',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppColors.textDarkSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: const Text('Annuler',
-                style: TextStyle(color: Colors.white54)),
+                style: TextStyle(color: AppColors.textDarkSecondary)),
           ),
           TextButton(
             onPressed: () async {
@@ -320,7 +328,7 @@ class AccountScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: AppColors.backgroundLight,
         title: const Text('Supprimer mon compte',
             style: TextStyle(color: Colors.red)),
         content: Column(
@@ -328,7 +336,7 @@ class AccountScreen extends StatelessWidget {
           children: [
             const Text(
               'Cette action est irréversible. Votre compte sera supprimé dans 30 jours.',
-              style: TextStyle(color: Colors.white70),
+              style: TextStyle(color: AppColors.textDarkSecondary),
             ),
             const SizedBox(height: 16),
             _DialogField(
@@ -341,7 +349,7 @@ class AccountScreen extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: const Text('Annuler',
-                style: TextStyle(color: Colors.white54)),
+                style: TextStyle(color: AppColors.textDarkSecondary)),
           ),
           TextButton(
             onPressed: () async {
@@ -388,7 +396,7 @@ class _SectionLabel extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-            color: Colors.white54,
+            color: AppColors.textDarkSecondary,
             fontSize: 12,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.5),
@@ -415,14 +423,22 @@ class _ActionTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: AppColors.cardLight,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.inputBorderLight),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(8),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: ListTile(
         leading: Icon(icon, color: color, size: 22),
         title: Text(label,
             style: TextStyle(color: color, fontWeight: FontWeight.w500)),
-        trailing: const Icon(Icons.chevron_right, color: Colors.white24),
+        trailing: const Icon(Icons.chevron_right, color: AppColors.textDarkSecondary),
         onTap: onTap,
       ),
     );
@@ -445,15 +461,23 @@ class _DialogField extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: AppColors.textDark),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white54),
+        labelStyle: const TextStyle(color: AppColors.textDarkSecondary),
         filled: true,
-        fillColor: const Color(0xFF2A2A2A),
+        fillColor: AppColors.inputFillLight,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.inputBorderLight),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.inputBorderLight),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.primaryPink, width: 1.5),
         ),
       ),
     );

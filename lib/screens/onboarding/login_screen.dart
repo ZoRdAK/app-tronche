@@ -158,15 +158,15 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.backgroundLight,
         title: const Text('Code administrateur',
-            style: TextStyle(color: Colors.white)),
+            style: TextStyle(color: AppColors.textDark)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
               'Saisissez votre code PIN pour accéder à l\'administration sur cet appareil.',
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+              style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 14),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -175,14 +175,14 @@ class _LoginScreenState extends State<LoginScreen> {
               obscureText: true,
               maxLength: 6,
               autofocus: true,
-              style: const TextStyle(color: Colors.white, fontSize: 24, letterSpacing: 8),
+              style: const TextStyle(color: AppColors.textDark, fontSize: 24, letterSpacing: 8),
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: '••••',
-                hintStyle: const TextStyle(color: Color(0xFF444444)),
+                hintStyle: const TextStyle(color: AppColors.textDarkSecondary),
                 counterText: '',
                 filled: true,
-                fillColor: AppColors.background,
+                fillColor: AppColors.inputFillLight,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: AppColors.primaryPink),
@@ -194,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, null),
-            child: const Text('Passer', style: TextStyle(color: Colors.white54)),
+            child: const Text('Passer', style: TextStyle(color: AppColors.textDarkSecondary)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, pinCtrl.text),
@@ -212,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Saisissez votre email pour réinitialiser votre mot de passe.'),
-          backgroundColor: AppColors.inputBorder,
+          backgroundColor: AppColors.textDarkSecondary,
         ),
       );
       return;
@@ -227,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Un email de réinitialisation a été envoyé à $email.'),
-          backgroundColor: const Color(0xFF1E3A2A),
+          backgroundColor: AppColors.success,
         ),
       );
     } catch (_) {
@@ -235,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Impossible d\'envoyer l\'email. Réessayez plus tard.'),
-          backgroundColor: Color(0xFF2A1010),
+          backgroundColor: AppColors.error,
         ),
       );
     } finally {
@@ -246,12 +246,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -269,13 +269,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.textDark,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Retrouvez votre photobooth.',
-                  style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 15, color: AppColors.textDarkSecondary),
                 ),
                 const SizedBox(height: 36),
                 _buildLabel('Email'),
@@ -284,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('votre@email.com'),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Email requis';
@@ -297,14 +297,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _passwordCtrl,
                   obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textDark),
                   decoration: _inputDecoration('Votre mot de passe').copyWith(
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: AppColors.textMuted,
+                        color: AppColors.textDarkSecondary,
                       ),
                       onPressed: () =>
                           setState(() => _obscurePassword = !_obscurePassword),
@@ -343,9 +343,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2A1010),
+                      color: const Color(0xFFFFF0F0),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFF7A2020)),
+                      border: Border.all(color: AppColors.error.withAlpha(120)),
                     ),
                     child: Row(
                       children: [
@@ -380,7 +380,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 : null,
                             color: _isFormValid
                                 ? null
-                                : AppColors.inputBorder,
+                                : AppColors.inputBorderLight,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: ElevatedButton(
@@ -400,7 +400,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: _isFormValid
                                     ? Colors.white
-                                    : AppColors.textMuted,
+                                    : AppColors.textDarkSecondary,
                               ),
                             ),
                           ),
@@ -419,7 +419,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Text(
       text,
       style: const TextStyle(
-        color: Color(0xFFCCCCCC),
+        color: AppColors.textDark,
         fontSize: 14,
         fontWeight: FontWeight.w500,
       ),
@@ -429,16 +429,16 @@ class _LoginScreenState extends State<LoginScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF444444)),
+      hintStyle: const TextStyle(color: AppColors.textDarkSecondary),
       filled: true,
-      fillColor: AppColors.inputFill,
+      fillColor: AppColors.inputFillLight,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.inputBorder),
+        borderSide: const BorderSide(color: AppColors.inputBorderLight),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.inputBorder),
+        borderSide: const BorderSide(color: AppColors.inputBorderLight),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

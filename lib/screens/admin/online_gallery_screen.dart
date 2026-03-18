@@ -16,24 +16,24 @@ class OnlineGalleryScreen extends StatelessWidget {
     final galleryUrl = 'https://tronche.zordak.fr/g/$shareCode';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: AppColors.inputFill,
+        backgroundColor: AppColors.backgroundLight,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.navy),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Galerie en ligne',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
         ),
       ),
       body: shareCode.isEmpty
           ? const Center(
               child: Text(
                 'Code de partage non disponible',
-                style: TextStyle(color: Colors.white38),
+                style: TextStyle(color: AppColors.textDarkSecondary),
               ),
             )
           : ListView(
@@ -42,7 +42,7 @@ class OnlineGalleryScreen extends StatelessWidget {
                 const Text(
                   'Partagez votre galerie',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textDark,
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                   ),
@@ -51,7 +51,7 @@ class OnlineGalleryScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 const Text(
                   'Vos invités peuvent scanner ce QR code pour accéder à toutes les photos',
-                  style: TextStyle(color: Colors.white54, fontSize: 14),
+                  style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
@@ -63,6 +63,13 @@ class OnlineGalleryScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(20),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: QrImageView(
                       data: galleryUrl,
@@ -79,8 +86,9 @@ class OnlineGalleryScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: AppColors.cardLight,
                     borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.inputBorderLight),
                   ),
                   child: Text(
                     galleryUrl,
@@ -95,26 +103,36 @@ class OnlineGalleryScreen extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Copy button
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: galleryUrl));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Lien copié dans le presse-papiers'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.copy, color: Colors.white),
-                  label: const Text(
-                    'Copier le lien',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryPink,
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: galleryUrl));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Lien copié dans le presse-papiers'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.copy, color: Colors.white),
+                      label: const Text(
+                        'Copier le lien',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -151,20 +169,21 @@ class OnlineGalleryScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: AppColors.cardLight,
                     borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.inputBorderLight),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
                         'Code : ',
-                        style: TextStyle(color: Colors.white54),
+                        style: TextStyle(color: AppColors.textDarkSecondary),
                       ),
                       Text(
                         shareCode,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textDark,
                           fontWeight: FontWeight.w700,
                           fontSize: 18,
                           letterSpacing: 3,
