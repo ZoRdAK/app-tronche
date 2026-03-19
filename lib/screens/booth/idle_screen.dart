@@ -134,20 +134,22 @@ class _IdleScreenState extends State<IdleScreen> {
     final frameSize = screenWidth * 0.70;
 
     return Scaffold(
-      body: Container(
-        // Warm gradient background
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFDF8F4),
-              Color(0xFFF5E6D8),
-              Color(0xFFFCE4EC),
-            ],
+      backgroundColor: const Color(0xFFFDF8F4),
+      body: SizedBox.expand(
+        child: Container(
+          // Warm gradient background
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFFDF8F4),
+                Color(0xFFF5E6D8),
+                Color(0xFFFCE4EC),
+              ],
+            ),
           ),
-        ),
-        child: SafeArea(
+          child: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -280,6 +282,7 @@ class _IdleScreenState extends State<IdleScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
