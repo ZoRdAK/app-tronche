@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../config.dart';
 import '../../providers/app_state.dart';
 import '../../providers/photo_state.dart';
-import '../../services/camera_service.dart';
 import '../../widgets/slideshow_widget.dart';
 import 'camera_screen.dart';
 
@@ -18,8 +16,6 @@ class IdleScreen extends StatefulWidget {
 }
 
 class _IdleScreenState extends State<IdleScreen> {
-  final CameraService _cameraService = CameraService();
-  bool _cameraReady = false;
   Timer? _longPressTimer;
   bool _longPressActive = false;
 
@@ -40,22 +36,15 @@ class _IdleScreenState extends State<IdleScreen> {
       // No camera needed in screenshot mode
       return;
     }
-    // Load photos and initialise camera for fallback
+    // Load photos
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PhotoState>().loadPhotos();
-      _initCamera();
     });
-  }
-
-  Future<void> _initCamera() async {
-    await _cameraService.initialize();
-    if (mounted) setState(() => _cameraReady = _cameraService.isInitialized);
   }
 
   @override
   void dispose() {
     _longPressTimer?.cancel();
-    _cameraService.disposeCamera();
     // Disable wakelock when leaving booth mode.
     WakelockPlus.disable();
     super.dispose();

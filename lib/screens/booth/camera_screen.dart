@@ -9,7 +9,7 @@ import '../../services/camera_service.dart';
 import '../../services/gif_service.dart';
 import '../../widgets/countdown_overlay.dart';
 import '../../widgets/flash_overlay.dart';
-import '../../widgets/overlay_painter.dart';
+
 import '../../widgets/shutter_button.dart';
 import 'preview_screen.dart';
 
@@ -258,10 +258,6 @@ class _CameraScreenState extends State<CameraScreen> {
                 ),
               ),
             ),
-
-          // Live overlay
-          if (config != null)
-            CustomPaint(painter: OverlayPainter(config: config)),
 
           // Top overlay: couple names + date
           if (config != null)
