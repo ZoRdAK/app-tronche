@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/event_config.dart';
@@ -90,6 +91,47 @@ class DatabaseService {
   }
 
   // Photos
+
+  /// Fix photo paths that became invalid after app reinstall (iOS sandbox GUID changes).
+  /// Extracts filename from old path and looks for it in the current app documents directory.
+  Future<void> repairPhotoPaths(String currentDocsDir) async {
+    final db = await database;
+    final photos = await db.query('photos');
+    for (final row in photos) {
+      final localPath = row['local_path'] as String? ?? '';
+      final thumbPath = row['thumbnail_path'] as String? ?? '';
+
+      if (localPath.isNotEmpty && !File(localPath).existsSync()) {
+        // Extract filename and try to find it in current docs dir
+        final filename = localPath.split('/').last;
+        final candidates = [
+          '$currentDocsDir/photos/$filename',
+          '$currentDocsDir/$filename',
+        ];
+        String? newPath;
+        for (final c in candidates) {
+          if (File(c).existsSync()) {
+            newPath = c;
+            break;
+          }
+        }
+        if (newPath != null) {
+          final updates = <String, dynamic>{'local_path': newPath};
+          // Also try to fix thumbnail
+          if (thumbPath.isNotEmpty && !File(thumbPath).existsSync()) {
+            final thumbFilename = thumbPath.split('/').last;
+            final thumbCandidate = '$currentDocsDir/photos/thumbs/$thumbFilename';
+            if (File(thumbCandidate).existsSync()) {
+              updates['thumbnail_path'] = thumbCandidate;
+            } else {
+              updates['thumbnail_path'] = newPath; // fallback to full photo
+            }
+          }
+          await db.update('photos', updates, where: 'id = ?', whereArgs: [row['id']]);
+        }
+      }
+    }
+  }
 
   Future<int> insertPhoto(Photo photo) async {
     final db = await database;

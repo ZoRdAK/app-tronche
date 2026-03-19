@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import '../models/event_config.dart';
 import '../services/database_service.dart';
 
@@ -41,10 +42,17 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  /// Loads EventConfig from SQLite and sets initialized state.
+  /// Loads EventConfig from SQLite, repairs broken photo paths, and sets initialized state.
   Future<void> init() async {
     _eventConfig = await _db.getEventConfig();
     _isLoggedIn = _eventConfig != null && _eventConfig!.jwtToken.isNotEmpty;
+
+    // Repair photo paths that broke after app reinstall (iOS sandbox GUID changes)
+    try {
+      final docsDir = await getApplicationDocumentsDirectory();
+      await _db.repairPhotoPaths(docsDir.path);
+    } catch (_) {}
+
     _isInitialized = true;
     notifyListeners();
   }
