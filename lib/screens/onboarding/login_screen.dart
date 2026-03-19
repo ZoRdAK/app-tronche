@@ -133,8 +133,10 @@ class _LoginScreenState extends State<LoginScreen> {
         // Ask user to re-enter their admin PIN (bcrypt hash from server can't be used locally)
         if (!mounted) return;
         final pin = await _askAdminPin();
-        if (pin != null && pin.length >= 4 && mounted) {
-          final pinHash = sha256.convert(utf8.encode(pin)).toString();
+        if (mounted) {
+          // Use entered PIN, or default "0000" if skipped
+          final effectivePin = (pin != null && pin.length >= 4) ? pin : '0000';
+          final pinHash = sha256.convert(utf8.encode(effectivePin)).toString();
           final updatedConfig = config.copyWith(adminPasswordHash: pinHash);
           await context.read<AppState>().setEventConfig(updatedConfig);
         }
@@ -180,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'Saisissez votre code PIN (4-6 chiffres) pour accéder à l\'espace admin sur cet appareil.',
+              'Saisissez votre code PIN (4-6 chiffres) pour accéder à l\'espace admin sur cet appareil.\n\nSi vous passez, le code par défaut sera 0000.',
               style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 14),
             ),
             const SizedBox(height: 16),
