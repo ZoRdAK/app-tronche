@@ -31,6 +31,14 @@ Build and upload to TestFlight
 
 Sync metadata to App Store Connect (no binary)
 
+### ios screenshots
+
+```sh
+[bundle exec] fastlane ios screenshots
+```
+
+Upload metadata + screenshots to App Store Connect
+
 ### ios release
 
 ```sh

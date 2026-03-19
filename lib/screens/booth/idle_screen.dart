@@ -97,66 +97,52 @@ class _IdleScreenState extends State<IdleScreen> {
         .map((p) => p.localPath)
         .toList();
 
-    // Fallback: warm gradient with logo when no photos yet
-    Widget cameraFallback;
-    if (_cameraReady && _cameraService.controller != null) {
-      final ctrl = _cameraService.controller!;
-      cameraFallback = SizedBox.expand(
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: ctrl.value.previewSize!.height,
-            height: ctrl.value.previewSize!.width,
-            child: CameraPreview(ctrl),
-          ),
+    // Fallback: always show warm gradient with logo (never black)
+    final cameraFallback = Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFFDF8F4),
+            Color(0xFFF5E6D8),
+            Color(0xFFFCE4EC),
+          ],
         ),
-      );
-    } else {
-      // Beautiful wedding-themed gradient fallback — no black screen
-      cameraFallback = Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFDF8F4),
-              Color(0xFFF5E6D8),
-              Color(0xFFFCE4EC),
-            ],
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'assets/logo.png',
-                width: 150,
-                errorBuilder: (_, __, ___) => const Text(
-                  'Tronche!',
-                  style: TextStyle(
-                    color: Color(0xFFE91E8C),
-                    fontSize: 42,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Prenez la première photo !',
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/logo.png',
+              width: 180,
+              errorBuilder: (_, __, ___) => const Text(
+                'Tronche!',
                 style: TextStyle(
-                  color: Color(0xFF9E6B7A),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 0.5,
+                  color: Color(0xFFE91E8C),
+                  fontSize: 42,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1,
                 ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              photoPaths.isEmpty
+                  ? 'Prenez la première photo !'
+                  : 'Le photobooth rigolo',
+              style: const TextStyle(
+                color: Color(0xFF9E6B7A),
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
 
     // In screenshot mode, show asset images instead of file-based slideshow
     Widget backgroundWidget;

@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../config.dart';
 
 /// Full-screen crossfade slideshow of local photo files.
-/// Falls back to [fallback] when [photoPaths] is empty.
+/// Falls back to [fallback] when [photoPaths] is empty or files don't exist.
 class SlideshowWidget extends StatefulWidget {
   final List<String> photoPaths;
   final Widget fallback;
@@ -24,10 +23,12 @@ class SlideshowWidget extends StatefulWidget {
 class _SlideshowWidgetState extends State<SlideshowWidget> {
   int _currentIndex = 0;
   Timer? _timer;
+  List<String> _validPaths = [];
 
   @override
   void initState() {
     super.initState();
+    _filterValidPaths();
     _startTimer();
   }
 
@@ -35,17 +36,25 @@ class _SlideshowWidgetState extends State<SlideshowWidget> {
   void didUpdateWidget(SlideshowWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.photoPaths != widget.photoPaths) {
+      _filterValidPaths();
       _currentIndex = 0;
       _restartTimer();
     }
   }
 
+  /// Only keep paths where the file actually exists on disk.
+  void _filterValidPaths() {
+    _validPaths = widget.photoPaths
+        .where((p) => File(p).existsSync())
+        .toList();
+  }
+
   void _startTimer() {
-    if (widget.photoPaths.length <= 1) return;
+    if (_validPaths.length <= 1) return;
     _timer = Timer.periodic(widget.interval, (_) {
       if (!mounted) return;
       setState(() {
-        _currentIndex = (_currentIndex + 1) % widget.photoPaths.length;
+        _currentIndex = (_currentIndex + 1) % _validPaths.length;
       });
     });
   }
@@ -63,28 +72,36 @@ class _SlideshowWidgetState extends State<SlideshowWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.photoPaths.isEmpty) {
+    if (_validPaths.isEmpty) {
       return widget.fallback;
     }
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 800),
-      transitionBuilder: (child, animation) {
-        return FadeTransition(opacity: animation, child: child);
-      },
-      child: _buildImage(_currentIndex),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Warm fallback behind in case image takes time to load
+        widget.fallback,
+        // Photo on top
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 800),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          child: _buildImage(_currentIndex),
+        ),
+      ],
     );
   }
 
   Widget _buildImage(int index) {
-    if (index >= widget.photoPaths.length) return widget.fallback;
-    final path = widget.photoPaths[index];
+    if (index >= _validPaths.length) return const SizedBox.shrink();
+    final path = _validPaths[index];
     return SizedBox.expand(
       key: ValueKey(path),
       child: Image.file(
         File(path),
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(color: AppColors.background),
+        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
       ),
     );
   }

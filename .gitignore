@@ -50,3 +50,7 @@ android/fastlane/play-store-key.json
 
 # Screenshot test assets (not for prod)
 assets/screenshots/
+
+# Android signing
+android/key.properties
+android/app/tronche-release.jks
