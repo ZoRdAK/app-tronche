@@ -130,31 +130,33 @@ class _ServerSyncScreenState extends State<ServerSyncScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 24),
-              // Logo
-              Image.asset(
-                'assets/logo.png',
-                width: 80,
-                errorBuilder: (_, __, ___) => ShaderMask(
-                  shaderCallback: (bounds) =>
-                      AppColors.primaryGradient.createShader(bounds),
-                  child: const Text(
-                    'Tronche!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: -1,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Logo
+                Image.asset(
+                  'assets/logo.png',
+                  width: 80,
+                  errorBuilder: (_, __, ___) => ShaderMask(
+                    shaderCallback: (bounds) =>
+                        AppColors.primaryGradient.createShader(bounds),
+                    child: const Text(
+                      'Tronche!',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: -1,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const Spacer(flex: 2),
+                const SizedBox(height: 48),
               if (_isDone) ...[
                 const Icon(
                   Icons.check_circle_rounded,
@@ -266,7 +268,7 @@ class _ServerSyncScreenState extends State<ServerSyncScreen> {
                     ),
                   ),
               ],
-              const Spacer(flex: 3),
+              const SizedBox(height: 32),
               // Skip button
               if (!_isDone && _error == null)
                 TextButton(
@@ -279,9 +281,9 @@ class _ServerSyncScreenState extends State<ServerSyncScreen> {
                     ),
                   ),
                 ),
-              const SizedBox(height: 8),
             ],
           ),
+        ),
         ),
       ),
     );

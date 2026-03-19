@@ -213,8 +213,11 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, pinCtrl.text),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryPink),
-            child: const Text('Valider'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryPink,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Valider', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
