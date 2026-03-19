@@ -55,16 +55,17 @@ class SyncService {
     if (!_syncState.isOnline) return;
 
     _isSyncing = true;
-    _syncState.isSyncing = true;
+    if (!_syncState.isDisposed) _syncState.isSyncing = true;
 
     try {
+      // First clean up any stale queue items (synced photos with pending queue)
+      await _db.cleanOrphanedQueueItems();
       await _syncPhotos();
       await _processEmailQueue();
     } finally {
       _isSyncing = false;
       if (!_syncState.isDisposed) {
         _syncState.isSyncing = false;
-        // Refresh counts in both states so the UI stays up to date.
         await _syncState.loadCounts();
         await _syncState.loadQueueItems();
       }

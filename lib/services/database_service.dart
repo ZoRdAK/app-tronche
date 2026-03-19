@@ -114,14 +114,25 @@ class DatabaseService {
 
   Future<void> markPhotoSynced(int id, String serverPhotoId) async {
     final db = await database;
+    final now = DateTime.now().toIso8601String();
     await db.update(
       'photos',
       {
         'is_synced': 1,
         'server_photo_id': serverPhotoId,
-        'synced_at': DateTime.now().toIso8601String(),
+        'synced_at': now,
       },
       where: 'id = ?',
+      whereArgs: [id],
+    );
+    // Also mark the corresponding send_queue 'sync' item as sent
+    await db.update(
+      'send_queue',
+      {
+        'status': 'sent',
+        'sent_at': now,
+      },
+      where: "photo_id = ? AND type = 'sync' AND status != 'sent'",
       whereArgs: [id],
     );
   }
@@ -198,6 +209,12 @@ class DatabaseService {
     await db.rawDelete(
       'DELETE FROM send_queue WHERE photo_id NOT IN (SELECT id FROM photos)',
     );
+    // Also mark sync items as 'sent' if the photo is already synced
+    await db.rawUpdate('''
+      UPDATE send_queue SET status = 'sent', sent_at = ?
+      WHERE type = 'sync' AND status != 'sent'
+      AND photo_id IN (SELECT id FROM photos WHERE is_synced = 1)
+    ''', [DateTime.now().toIso8601String()]);
   }
 
   Future<int> getPendingQueueCount() async {

@@ -38,12 +38,16 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
     final syncState = context.watch<SyncState>();
     final photoState = context.watch<PhotoState>();
     final syncService = context.read<SyncService>();
-    final items = syncState.queueItems;
+    // Show photo sync status from PhotoState (source of truth)
+    final totalPhotos = photoState.photoCount;
+    final syncedPhotos = photoState.syncedCount;
+    final pendingPhotos = photoState.pendingCount;
 
-    final pending =
-        items.where((i) => i.status == 'pending' || i.status == 'sending').toList();
-    final sent = items.where((i) => i.status == 'sent').toList();
-    final failed = items.where((i) => i.status == 'failed').toList();
+    // Show only email items from send_queue (sync items are tracked via photos table)
+    final emailItems = syncState.queueItems.where((i) => i.type == 'email').toList();
+    final pendingEmails = emailItems.where((i) => i.status == 'pending' || i.status == 'sending').toList();
+    final sentEmails = emailItems.where((i) => i.status == 'sent').toList();
+    final failedEmails = emailItems.where((i) => i.status == 'failed').toList();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -103,74 +107,154 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
             ),
           ),
 
-          // Queue list
+          // Sync progress
+          if (syncState.isSyncing)
+            const LinearProgressIndicator(
+              color: AppColors.primaryPink,
+              backgroundColor: AppColors.inputBorderLight,
+              minHeight: 3,
+            ),
+
+          // Content
           Expanded(
-            child: items.isEmpty
-                ? const Center(
-                    child: Text(
-                      'La file est vide',
-                      style: TextStyle(
-                          color: AppColors.textDarkSecondary, fontSize: 16),
+            child: RefreshIndicator(
+              onRefresh: _refresh,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                children: [
+                  // ── Photo sync summary card ──
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardLight,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.inputBorderLight),
                     ),
-                  )
-                : RefreshIndicator(
-                    onRefresh: _refresh,
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (syncState.isSyncing) ...[
-                          const LinearProgressIndicator(
-                            color: AppColors.primaryPink,
-                            backgroundColor: AppColors.inputBorderLight,
+                        const Text(
+                          'Synchronisation des photos',
+                          style: TextStyle(
+                            color: AppColors.textDark,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const SizedBox(height: 8),
-                        ],
-                        if (pending.isNotEmpty) ...[
-                          _SectionHeader(
-                            label: 'En attente',
-                            count: pending.length,
-                            dotColor: Colors.amber,
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _StatChip(
+                                label: 'Total',
+                                value: '$totalPhotos',
+                                color: AppColors.primaryPink,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _StatChip(
+                                label: 'Synchronisées',
+                                value: '$syncedPhotos',
+                                color: AppColors.success,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _StatChip(
+                                label: 'En attente',
+                                value: '$pendingPhotos',
+                                color: pendingPhotos > 0 ? AppColors.warning : AppColors.success,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (pendingPhotos > 0 && syncState.isSyncing)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Text(
+                              'Synchronisation en cours…',
+                              style: TextStyle(color: AppColors.primaryPink, fontSize: 13),
+                            ),
                           ),
-                          ...pending.map((item) => _SimpleItemTile(
-                                item: item,
-                                thumbnail: _thumbnailFor(item, photoState),
-                                isOnline: syncState.isOnline,
-                                isSyncing: syncState.isSyncing,
-                              )),
-                          const SizedBox(height: 12),
-                        ],
-                        if (failed.isNotEmpty) ...[
-                          _SectionHeader(
-                            label: 'Échoué',
-                            count: failed.length,
-                            dotColor: Colors.red,
+                        if (pendingPhotos > 0 && !syncState.isSyncing && syncState.isOnline)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Text(
+                              'Prochaine synchronisation dans quelques secondes…',
+                              style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 13),
+                            ),
                           ),
-                          ...failed.map((item) => _SimpleItemTile(
-                                item: item,
-                                thumbnail: _thumbnailFor(item, photoState),
-                                isOnline: syncState.isOnline,
-                                isSyncing: syncState.isSyncing,
-                              )),
-                          const SizedBox(height: 12),
-                        ],
-                        if (sent.isNotEmpty) ...[
-                          _SectionHeader(
-                            label: 'Envoyé',
-                            count: sent.length,
-                            dotColor: Colors.green,
+                        if (pendingPhotos > 0 && !syncState.isOnline)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: Text(
+                              'En attente de connexion réseau…',
+                              style: TextStyle(color: AppColors.warning, fontSize: 13),
+                            ),
                           ),
-                          ...sent.map((item) => _SimpleItemTile(
-                                item: item,
-                                thumbnail: _thumbnailFor(item, photoState),
-                                isOnline: syncState.isOnline,
-                                isSyncing: syncState.isSyncing,
-                              )),
-                          const SizedBox(height: 12),
-                        ],
                       ],
                     ),
                   ),
+
+                  // ── Emails section ──
+                  if (emailItems.isNotEmpty) ...[
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 8, top: 4),
+                      child: Text(
+                        'Envois par email',
+                        style: TextStyle(
+                          color: AppColors.textDark,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    if (pendingEmails.isNotEmpty) ...[
+                      _SectionHeader(label: 'En attente', count: pendingEmails.length, dotColor: Colors.amber),
+                      ...pendingEmails.map((item) => _SimpleItemTile(
+                            item: item,
+                            thumbnail: _thumbnailFor(item, photoState),
+                            isOnline: syncState.isOnline,
+                            isSyncing: syncState.isSyncing,
+                          )),
+                      const SizedBox(height: 8),
+                    ],
+                    if (failedEmails.isNotEmpty) ...[
+                      _SectionHeader(label: 'Échoué', count: failedEmails.length, dotColor: Colors.red),
+                      ...failedEmails.map((item) => _SimpleItemTile(
+                            item: item,
+                            thumbnail: _thumbnailFor(item, photoState),
+                            isOnline: syncState.isOnline,
+                            isSyncing: syncState.isSyncing,
+                          )),
+                      const SizedBox(height: 8),
+                    ],
+                    if (sentEmails.isNotEmpty) ...[
+                      _SectionHeader(label: 'Envoyé', count: sentEmails.length, dotColor: Colors.green),
+                      ...sentEmails.map((item) => _SimpleItemTile(
+                            item: item,
+                            thumbnail: _thumbnailFor(item, photoState),
+                            isOnline: syncState.isOnline,
+                            isSyncing: syncState.isSyncing,
+                          )),
+                    ],
+                  ],
+
+                  if (emailItems.isEmpty && pendingPhotos == 0)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 32),
+                      child: Center(
+                        child: Text(
+                          'Tout est à jour !',
+                          style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
 
           // Force sync button
@@ -378,6 +462,39 @@ class _SimpleItemTile extends StatelessWidget {
       ),
       child: const Icon(Icons.photo,
           color: AppColors.textDarkSecondary, size: 22),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatChip({required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      decoration: BoxDecoration(
+        color: color.withAlpha(20),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: color),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11, color: AppColors.textDarkSecondary),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
