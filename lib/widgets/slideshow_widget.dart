@@ -24,6 +24,7 @@ class _SlideshowWidgetState extends State<SlideshowWidget> {
   int _currentIndex = 0;
   Timer? _timer;
   List<String> _validPaths = [];
+  bool _flashing = false;
 
   @override
   void initState() {
@@ -53,8 +54,14 @@ class _SlideshowWidgetState extends State<SlideshowWidget> {
     if (_validPaths.length <= 1) return;
     _timer = Timer.periodic(widget.interval, (_) {
       if (!mounted) return;
-      setState(() {
-        _currentIndex = (_currentIndex + 1) % _validPaths.length;
+      // Trigger flash, then advance index
+      setState(() => _flashing = true);
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (!mounted) return;
+        setState(() {
+          _currentIndex = (_currentIndex + 1) % _validPaths.length;
+          _flashing = false;
+        });
       });
     });
   }
@@ -81,13 +88,19 @@ class _SlideshowWidgetState extends State<SlideshowWidget> {
       children: [
         // Warm fallback behind in case image takes time to load
         widget.fallback,
-        // Photo on top
+        // Photo on top with crossfade
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 800),
           transitionBuilder: (child, animation) {
             return FadeTransition(opacity: animation, child: child);
           },
           child: _buildImage(_currentIndex),
+        ),
+        // Camera flash overlay
+        AnimatedOpacity(
+          opacity: _flashing ? 0.8 : 0.0,
+          duration: const Duration(milliseconds: 100),
+          child: Container(color: Colors.white),
         ),
       ],
     );
