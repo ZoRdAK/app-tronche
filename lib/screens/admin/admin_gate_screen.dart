@@ -61,9 +61,23 @@ class _AdminGateScreenState extends State<AdminGateScreen>
     setState(() => _input = _input.substring(0, _input.length - 1));
   }
 
+  /// Check if PIN was never properly set (empty hash or default "0000" hash)
+  bool get _needsSetup {
+    final config = context.read<AppState>().eventConfig;
+    if (config == null) return true;
+    final defaultHash = sha256.convert(utf8.encode('0000')).toString();
+    return config.adminPasswordHash.isEmpty || config.adminPasswordHash == defaultHash;
+  }
+
   void _trySubmit() {
     final config = context.read<AppState>().eventConfig;
     if (config == null) return;
+
+    if (_needsSetup) {
+      // First time: save this PIN as the new admin code
+      _saveNewPin();
+      return;
+    }
 
     final inputHash = sha256.convert(utf8.encode(_input)).toString();
     if (inputHash == config.adminPasswordHash) {
@@ -73,6 +87,15 @@ class _AdminGateScreenState extends State<AdminGateScreen>
     } else if (_input.length >= _maxDigits) {
       _failedAttempt();
     }
+  }
+
+  Future<void> _saveNewPin() async {
+    final pinHash = sha256.convert(utf8.encode(_input)).toString();
+    await context.read<AppState>().updateEventConfig({'admin_password_hash': pinHash});
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const DashboardScreen()),
+    );
   }
 
   void _failedAttempt() {
@@ -103,9 +126,9 @@ class _AdminGateScreenState extends State<AdminGateScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Code administrateur',
-              style: TextStyle(
+            Text(
+              _needsSetup ? 'Créez votre code' : 'Code administrateur',
+              style: const TextStyle(
                 color: AppColors.textDark,
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -113,9 +136,11 @@ class _AdminGateScreenState extends State<AdminGateScreen>
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Saisissez votre code PIN (4-6 chiffres)',
-              style: TextStyle(color: AppColors.textDarkSecondary, fontSize: 14),
+            Text(
+              _needsSetup
+                  ? 'Choisissez un code PIN (4-6 chiffres) pour protéger l\'espace admin'
+                  : 'Saisissez votre code PIN (4-6 chiffres)',
+              style: const TextStyle(color: AppColors.textDarkSecondary, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
