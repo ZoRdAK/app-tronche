@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 /// Full-screen crossfade slideshow of local photo files.
+/// Shuffles order, flashes between transitions, pauses on long press.
 /// Falls back to [fallback] when [photoPaths] is empty or files don't exist.
 class SlideshowWidget extends StatefulWidget {
   final List<String> photoPaths;
@@ -25,11 +27,12 @@ class _SlideshowWidgetState extends State<SlideshowWidget> {
   Timer? _timer;
   List<String> _validPaths = [];
   bool _flashing = false;
+  bool _paused = false;
 
   @override
   void initState() {
     super.initState();
-    _filterValidPaths();
+    _filterAndShuffle();
     _startTimer();
   }
 
@@ -37,24 +40,24 @@ class _SlideshowWidgetState extends State<SlideshowWidget> {
   void didUpdateWidget(SlideshowWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.photoPaths != widget.photoPaths) {
-      _filterValidPaths();
+      _filterAndShuffle();
       _currentIndex = 0;
       _restartTimer();
     }
   }
 
-  /// Only keep paths where the file actually exists on disk.
-  void _filterValidPaths() {
+  /// Filter valid paths and shuffle for random order.
+  void _filterAndShuffle() {
     _validPaths = widget.photoPaths
         .where((p) => File(p).existsSync())
-        .toList();
+        .toList()
+      ..shuffle(Random());
   }
 
   void _startTimer() {
     if (_validPaths.length <= 1) return;
     _timer = Timer.periodic(widget.interval, (_) {
-      if (!mounted) return;
-      // Trigger flash, then advance index
+      if (!mounted || _paused) return;
       setState(() => _flashing = true);
       Future.delayed(const Duration(milliseconds: 100), () {
         if (!mounted) return;
@@ -83,26 +86,28 @@ class _SlideshowWidgetState extends State<SlideshowWidget> {
       return widget.fallback;
     }
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Warm fallback behind in case image takes time to load
-        widget.fallback,
-        // Photo on top with crossfade
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 800),
-          transitionBuilder: (child, animation) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          child: _buildImage(_currentIndex),
-        ),
-        // Camera flash overlay
-        AnimatedOpacity(
-          opacity: _flashing ? 0.8 : 0.0,
-          duration: const Duration(milliseconds: 100),
-          child: Container(color: Colors.white),
-        ),
-      ],
+    return GestureDetector(
+      // Long press pauses the slideshow (like Instagram stories)
+      onLongPressStart: (_) => setState(() => _paused = true),
+      onLongPressEnd: (_) => setState(() => _paused = false),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          widget.fallback,
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 800),
+            transitionBuilder: (child, animation) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            child: _buildImage(_currentIndex),
+          ),
+          AnimatedOpacity(
+            opacity: _flashing ? 0.8 : 0.0,
+            duration: const Duration(milliseconds: 100),
+            child: Container(color: Colors.white),
+          ),
+        ],
+      ),
     );
   }
 
