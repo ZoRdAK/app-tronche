@@ -29,15 +29,15 @@ class OverlayPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Bottom gradient
-    final gradientHeight = h * 0.22;
-    final rect = Rect.fromLTWH(0, h - gradientHeight, w, gradientHeight);
-    final gradient = LinearGradient(
+    // Top gradient for names overlay
+    final topGradientHeight = h * 0.22;
+    final topRect = Rect.fromLTWH(0, 0, w, topGradientHeight);
+    final topGradient = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [Colors.transparent, Colors.black.withAlpha(180)],
+      colors: [Colors.black.withAlpha(180), Colors.transparent],
     );
-    canvas.drawRect(rect, Paint()..shader = gradient.createShader(rect));
+    canvas.drawRect(topRect, Paint()..shader = topGradient.createShader(topRect));
 
     // Thin white border — 20px from edges
     const pad = 20.0;
@@ -50,15 +50,15 @@ class OverlayPainter extends CustomPainter {
       borderPaint,
     );
 
-    // Name & date centered at bottom
+    // Name & date centered at top
     final nameText = '${config.name1} & ${config.name2}';
     final dateText = _formatDate(config.eventDate);
     _drawCenteredText(
       canvas,
       nameText,
       size,
-      y: h - 80,
-      fontSize: 22,
+      y: 48,
+      fontSize: 24,
       opacity: 0.92,
       fontStyle: FontStyle.italic,
     );
@@ -66,8 +66,8 @@ class OverlayPainter extends CustomPainter {
       canvas,
       dateText,
       size,
-      y: h - 50,
-      fontSize: 16,
+      y: 80,
+      fontSize: 15,
       opacity: 0.75,
     );
   }
@@ -80,13 +80,13 @@ class OverlayPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Left-bottom gradient
-    final gradientHeight = h * 0.15;
-    final rect = Rect.fromLTWH(0, h - gradientHeight, w / 2, gradientHeight);
+    // Top-left gradient for names
+    final gradientHeight = h * 0.18;
+    final rect = Rect.fromLTWH(0, 0, w, gradientHeight);
     final gradient = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [Colors.transparent, Colors.black.withAlpha(120)],
+      colors: [Colors.black.withAlpha(120), Colors.transparent],
     );
     canvas.drawRect(rect, Paint()..shader = gradient.createShader(rect));
 
@@ -97,7 +97,7 @@ class OverlayPainter extends CustomPainter {
       canvas,
       nameText,
       x: 28,
-      y: h - 60,
+      y: 48,
       fontSize: 18,
       opacity: 0.75,
     );
@@ -105,7 +105,7 @@ class OverlayPainter extends CustomPainter {
       canvas,
       dateText,
       x: 28,
-      y: h - 36,
+      y: 74,
       fontSize: 14,
       opacity: 0.55,
     );
@@ -119,13 +119,13 @@ class OverlayPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Full-bottom gradient
+    // Full-top gradient
     final gradientHeight = h * 0.25;
-    final rect = Rect.fromLTWH(0, h - gradientHeight, w, gradientHeight);
+    final rect = Rect.fromLTWH(0, 0, w, gradientHeight);
     final gradient = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [Colors.transparent, Colors.black.withAlpha(160)],
+      colors: [Colors.black.withAlpha(160), Colors.transparent],
     );
     canvas.drawRect(rect, Paint()..shader = gradient.createShader(rect));
 
@@ -140,7 +140,7 @@ class OverlayPainter extends CustomPainter {
       canvas,
       festiveLine,
       size,
-      y: h - 80,
+      y: 44,
       fontSize: 26,
       opacity: 0.95,
       fontWeight: FontWeight.w700,
@@ -149,7 +149,7 @@ class OverlayPainter extends CustomPainter {
       canvas,
       dateText,
       size,
-      y: h - 48,
+      y: 78,
       fontSize: 18,
       opacity: 0.75,
     );

@@ -73,7 +73,8 @@ class CameraService extends ChangeNotifier {
     }
   }
 
-  /// Mirrors an image file horizontally. Runs in an isolate via compute().
+  /// Mirrors an image file horizontally and resizes to max 1920px for faster
+  /// sync. Runs in an isolate via compute().
   static String? _mirrorImage(String path) {
     try {
       final bytes = File(path).readAsBytesSync();
@@ -82,8 +83,18 @@ class CameraService extends ChangeNotifier {
 
       image = img.flipHorizontal(image);
 
+      // Resize to max 1920px on the longest side (~300–500 KB vs 5–8 MB)
+      const maxDim = 1920;
+      if (image.width > maxDim || image.height > maxDim) {
+        if (image.width >= image.height) {
+          image = img.copyResize(image, width: maxDim);
+        } else {
+          image = img.copyResize(image, height: maxDim);
+        }
+      }
+
       final outPath = path.replaceAll('.jpg', '_m.jpg');
-      File(outPath).writeAsBytesSync(img.encodeJpg(image, quality: 92));
+      File(outPath).writeAsBytesSync(img.encodeJpg(image, quality: 85));
 
       // Clean up original
       try { File(path).deleteSync(); } catch (_) {}

@@ -119,6 +119,13 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
                       children: [
+                        if (syncState.isSyncing) ...[
+                          const LinearProgressIndicator(
+                            color: AppColors.primaryPink,
+                            backgroundColor: AppColors.inputBorderLight,
+                          ),
+                          const SizedBox(height: 8),
+                        ],
                         if (pending.isNotEmpty) ...[
                           _SectionHeader(
                             label: 'En attente',
@@ -128,6 +135,8 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
                           ...pending.map((item) => _SimpleItemTile(
                                 item: item,
                                 thumbnail: _thumbnailFor(item, photoState),
+                                isOnline: syncState.isOnline,
+                                isSyncing: syncState.isSyncing,
                               )),
                           const SizedBox(height: 12),
                         ],
@@ -140,6 +149,8 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
                           ...failed.map((item) => _SimpleItemTile(
                                 item: item,
                                 thumbnail: _thumbnailFor(item, photoState),
+                                isOnline: syncState.isOnline,
+                                isSyncing: syncState.isSyncing,
                               )),
                           const SizedBox(height: 12),
                         ],
@@ -152,6 +163,8 @@ class _SendQueueScreenState extends State<SendQueueScreen> {
                           ...sent.map((item) => _SimpleItemTile(
                                 item: item,
                                 thumbnail: _thumbnailFor(item, photoState),
+                                isOnline: syncState.isOnline,
+                                isSyncing: syncState.isSyncing,
                               )),
                           const SizedBox(height: 12),
                         ],
@@ -251,8 +264,15 @@ class _SectionHeader extends StatelessWidget {
 class _SimpleItemTile extends StatelessWidget {
   final SendQueueItem item;
   final String? thumbnail;
+  final bool isOnline;
+  final bool isSyncing;
 
-  const _SimpleItemTile({required this.item, this.thumbnail});
+  const _SimpleItemTile({
+    required this.item,
+    this.thumbnail,
+    this.isOnline = false,
+    this.isSyncing = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +292,7 @@ class _SimpleItemTile extends StatelessWidget {
       thumbWidget = _placeholderThumb();
     }
 
-    final statusText = _statusText();
+    final statusText = _statusText(isOnline, isSyncing);
     final dotColor = _dotColor();
 
     return Container(
@@ -310,7 +330,7 @@ class _SimpleItemTile extends StatelessWidget {
     );
   }
 
-  String _statusText() {
+  String _statusText(bool isOnline, bool isSyncing) {
     if (item.type == 'email') {
       final dest = item.recipient ?? 'email';
       switch (item.status) {
@@ -319,6 +339,8 @@ class _SimpleItemTile extends StatelessWidget {
         case 'failed':
           return 'Échec d\'envoi à $dest';
         default:
+          if (isSyncing) return 'Envoi en cours à $dest…';
+          if (!isOnline) return 'En attente de réseau…';
           return 'En attente d\'envoi à $dest';
       }
     } else {
@@ -328,7 +350,9 @@ class _SimpleItemTile extends StatelessWidget {
         case 'failed':
           return 'Échec de synchronisation';
         default:
-          return 'En attente de réseau…';
+          if (isSyncing) return 'Synchronisation en cours…';
+          if (!isOnline) return 'En attente de réseau…';
+          return 'En attente de synchronisation…';
       }
     }
   }

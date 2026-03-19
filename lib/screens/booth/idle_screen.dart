@@ -97,7 +97,7 @@ class _IdleScreenState extends State<IdleScreen> {
         .map((p) => p.localPath)
         .toList();
 
-    // Fallback: camera preview (Bug 2 fix: correct aspect ratio)
+    // Fallback: warm gradient with logo when no photos yet
     Widget cameraFallback;
     if (_cameraReady && _cameraService.controller != null) {
       final ctrl = _cameraService.controller!;
@@ -112,7 +112,50 @@ class _IdleScreenState extends State<IdleScreen> {
         ),
       );
     } else {
-      cameraFallback = Container(color: AppColors.background);
+      // Beautiful wedding-themed gradient fallback — no black screen
+      cameraFallback = Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFFDF8F4),
+              Color(0xFFF5E6D8),
+              Color(0xFFFCE4EC),
+            ],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/logo.png',
+                width: 150,
+                errorBuilder: (_, __, ___) => const Text(
+                  'Tronche!',
+                  style: TextStyle(
+                    color: Color(0xFFE91E8C),
+                    fontSize: 42,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Prenez la première photo !',
+                style: TextStyle(
+                  color: Color(0xFF9E6B7A),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     // In screenshot mode, show asset images instead of file-based slideshow
@@ -162,15 +205,14 @@ class _IdleScreenState extends State<IdleScreen> {
                     Text(
                       '${config.name1} & ${config.name2}',
                       style: const TextStyle(
-                        color: Colors.white,
+                        fontFamily: 'Georgia',
+                        fontStyle: FontStyle.italic,
                         fontSize: 30,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 1.5,
                         shadows: [
-                          Shadow(
-                            color: Colors.black54,
-                            blurRadius: 8,
-                          ),
+                          Shadow(blurRadius: 16, color: Colors.black54),
                         ],
                       ),
                       textAlign: TextAlign.center,
@@ -179,16 +221,10 @@ class _IdleScreenState extends State<IdleScreen> {
                     Text(
                       _formatDate(config.eventDate),
                       style: const TextStyle(
+                        fontSize: 15,
                         color: Colors.white70,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 1.2,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black54,
-                            blurRadius: 6,
-                          ),
-                        ],
+                        letterSpacing: 3,
+                        fontWeight: FontWeight.w300,
                       ),
                     ),
                   ],

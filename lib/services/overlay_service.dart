@@ -53,11 +53,11 @@ img.Image _applyElegantOverlay(
   int w,
   int h,
 ) {
-  // Semi-transparent gradient at bottom
+  // Semi-transparent gradient at top
   final gradientHeight = (h * 0.22).toInt();
-  for (var y = h - gradientHeight; y < h; y++) {
+  for (var y = 0; y < gradientHeight; y++) {
     final alpha =
-        ((y - (h - gradientHeight)) / gradientHeight * 180).toInt();
+        ((gradientHeight - y) / gradientHeight * 180).toInt();
     for (var x = 0; x < w; x++) {
       final px = image.getPixel(x, y);
       final r = ((px.r * (255 - alpha)) / 255).round();
@@ -81,7 +81,7 @@ img.Image _applyElegantOverlay(
     image.setPixel(w - borderPad - 1, y, borderColor);
   }
 
-  // Draw text centered at bottom
+  // Draw text centered at top
   final white90 = img.ColorRgba8(255, 255, 255, 230);
   final white70 = img.ColorRgba8(255, 255, 255, 178);
   img.drawString(
@@ -89,7 +89,7 @@ img.Image _applyElegantOverlay(
     nameText,
     font: img.arial24,
     x: null, // centered
-    y: h - 80,
+    y: 48,
     color: white90,
   );
   img.drawString(
@@ -97,7 +97,7 @@ img.Image _applyElegantOverlay(
     dateText,
     font: img.arial24,
     x: null,
-    y: h - 48,
+    y: 80,
     color: white70,
   );
 
@@ -111,11 +111,11 @@ img.Image _applyMinimalOverlay(
   int w,
   int h,
 ) {
-  // Subtle left-bottom gradient
-  final gradientHeight = (h * 0.15).toInt();
-  for (var y = h - gradientHeight; y < h; y++) {
+  // Subtle top-left gradient
+  final gradientHeight = (h * 0.18).toInt();
+  for (var y = 0; y < gradientHeight; y++) {
     final alpha =
-        ((y - (h - gradientHeight)) / gradientHeight * 120).toInt();
+        ((gradientHeight - y) / gradientHeight * 120).toInt();
     final halfW = w ~/ 2;
     for (var x = 0; x < halfW; x++) {
       final px = image.getPixel(x, y);
@@ -134,7 +134,7 @@ img.Image _applyMinimalOverlay(
     lowerName,
     font: img.arial24,
     x: 28,
-    y: h - 62,
+    y: 48,
     color: white70,
   );
   img.drawString(
@@ -142,7 +142,7 @@ img.Image _applyMinimalOverlay(
     dateText,
     font: img.arial14,
     x: 28,
-    y: h - 38,
+    y: 78,
     color: white50,
   );
 
@@ -157,9 +157,9 @@ img.Image _applyFestiveOverlay(
   int h,
 ) {
   final gradientHeight = (h * 0.25).toInt();
-  for (var y = h - gradientHeight; y < h; y++) {
+  for (var y = 0; y < gradientHeight; y++) {
     final alpha =
-        ((y - (h - gradientHeight)) / gradientHeight * 160).toInt();
+        ((gradientHeight - y) / gradientHeight * 160).toInt();
     for (var x = 0; x < w; x++) {
       final px = image.getPixel(x, y);
       final r = ((px.r * (255 - alpha)) / 255).round();
@@ -183,7 +183,7 @@ img.Image _applyFestiveOverlay(
     festiveLine,
     font: img.arial24,
     x: null,
-    y: h - 80,
+    y: 44,
     color: white90,
   );
   img.drawString(
@@ -191,7 +191,7 @@ img.Image _applyFestiveOverlay(
     '· $dateText ·',
     font: img.arial24,
     x: null,
-    y: h - 48,
+    y: 76,
     color: white70,
   );
 

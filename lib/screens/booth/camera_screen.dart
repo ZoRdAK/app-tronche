@@ -284,10 +284,12 @@ class _CameraScreenState extends State<CameraScreen> {
                       '${config.name1} & ${config.name2}',
                       style: const TextStyle(
                         fontFamily: 'Georgia',
-                        fontSize: 28,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 30,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
-                        shadows: [Shadow(blurRadius: 12, color: Colors.black54)],
+                        letterSpacing: 1.5,
+                        shadows: [Shadow(blurRadius: 16, color: Colors.black54)],
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -295,9 +297,10 @@ class _CameraScreenState extends State<CameraScreen> {
                     Text(
                       config.eventDate.replaceAll('-', '.'),
                       style: const TextStyle(
-                        color: Colors.white60,
-                        fontSize: 14,
-                        letterSpacing: 2,
+                        fontSize: 15,
+                        color: Colors.white70,
+                        letterSpacing: 3,
+                        fontWeight: FontWeight.w300,
                       ),
                       textAlign: TextAlign.center,
                     ),
