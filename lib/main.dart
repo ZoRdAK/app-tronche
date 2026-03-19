@@ -78,6 +78,7 @@ class AppRoot extends StatefulWidget {
 
 class _AppRootState extends State<AppRoot> {
   bool _syncStarted = false;
+  SyncService? _syncService;
 
   @override
   void initState() {
@@ -94,19 +95,19 @@ class _AppRootState extends State<AppRoot> {
   void _checkSync() {
     if (!mounted) return;
     final appState = context.read<AppState>();
-    final syncService = context.read<SyncService>();
+    _syncService = context.read<SyncService>();
     if (appState.isLoggedIn && !_syncStarted) {
       _syncStarted = true;
-      syncService.start();
+      _syncService?.start();
     } else if (!appState.isLoggedIn && _syncStarted) {
       _syncStarted = false;
-      syncService.stop();
+      _syncService?.stop();
     }
   }
 
   @override
   void dispose() {
-    try { context.read<SyncService>().stop(); } catch (_) {}
+    _syncService?.stop();
     super.dispose();
   }
 

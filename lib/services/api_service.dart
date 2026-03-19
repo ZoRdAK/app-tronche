@@ -222,7 +222,10 @@ class ApiService {
     try {
       final formData = FormData.fromMap({
         'takenAt': takenAt,
-        'photo': await MultipartFile.fromFile(filePath),
+        'photo': await MultipartFile.fromFile(
+          filePath,
+          contentType: DioMediaType('image', filePath.endsWith('.gif') ? 'gif' : 'jpeg'),
+        ),
       });
       final response = await _dio.post(
         '/api/events/$eventId/photos',

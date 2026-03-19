@@ -54,3 +54,6 @@ assets/screenshots/
 # Android signing
 android/key.properties
 android/app/tronche-release.jks
+
+# FVM Version Cache
+.fvm/
