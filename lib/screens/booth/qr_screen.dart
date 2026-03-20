@@ -17,7 +17,7 @@ class _QrScreenState extends State<QrScreen> {
   Timer? _timer;
 
   String get _photoUrl =>
-      'https://tronche.zordak.fr/p/${widget.photoCode}';
+      'https://tronche.net/p/${widget.photoCode}';
 
   @override
   void initState() {

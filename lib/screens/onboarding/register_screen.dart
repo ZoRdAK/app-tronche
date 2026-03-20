@@ -229,7 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   WidgetSpan(
                                     child: GestureDetector(
                                       onTap: () => _openUrl(
-                                        'https://tronche.zordak.fr/legal/cgu',
+                                        'https://tronche.net/legal/cgu',
                                       ),
                                       child: const Text(
                                         'CGU',
@@ -245,7 +245,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   WidgetSpan(
                                     child: GestureDetector(
                                       onTap: () => _openUrl(
-                                        'https://tronche.zordak.fr/legal/privacy',
+                                        'https://tronche.net/legal/privacy',
                                       ),
                                       child: const Text(
                                         'Politique de Confidentialité',

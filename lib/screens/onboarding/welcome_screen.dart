@@ -112,7 +112,7 @@ class WelcomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: () => _openUrl('https://tronche.zordak.fr/legal/cgu'),
+                    onPressed: () => _openUrl('https://tronche.net/legal/cgu'),
                     child: const Text(
                       'CGU',
                       style: TextStyle(
@@ -127,7 +127,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () =>
-                        _openUrl('https://tronche.zordak.fr/legal/privacy'),
+                        _openUrl('https://tronche.net/legal/privacy'),
                     child: const Text(
                       'Politique de confidentialité',
                       style: TextStyle(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppConfig {
-  static const String apiBaseUrl = 'https://tronche.zordak.fr';
+  static const String apiBaseUrl = 'https://tronche.net';
   static const String appName = 'Tronche!';
   static const Duration syncInterval = Duration(seconds: 30);
   static const Duration qrAutoReturnDelay = Duration(seconds: 15);
